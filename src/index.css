@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-light text-slate-800 dark:bg-dark dark:text-slate-100 antialiased transition-colors duration-300;
+  }
+}
+
+/* Glass card */
+.glass {
+  @apply bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-card shadow-glass dark:shadow-glass-dark;
+}
+
+.glass-dark {
+  @apply bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-card;
+}
