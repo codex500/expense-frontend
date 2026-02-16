@@ -31,9 +31,12 @@ export default function Register() {
       );
       window.location.replace('/');
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: { message?: string }; status?: number }; message?: string };
-      const msg = ax?.response?.data?.message || ax?.message || 'Registration failed. Check your connection.';
-      setError(msg);
+      const ax = err as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      if (ax?.response?.status === 404) {
+        setError('API not reachable. Ensure VITE_API_URL is set in your deployment (Vercel → Project Settings → Environment Variables).');
+      } else {
+        setError(ax?.response?.data?.message || ax?.message || 'Registration failed. Check your connection.');
+      }
     } finally {
       setLoading(false);
     }

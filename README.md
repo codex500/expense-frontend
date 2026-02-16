@@ -36,10 +36,13 @@ Output is in `dist/`.
 3. **Root Directory:** set to `trackify` if the repo root is the parent folder.
 4. **Build Command:** `npm run build`
 5. **Output Directory:** `dist`
-6. **Environment Variables:** add `VITE_API_URL` = `https://expense-backend-lxtw.onrender.com/api` (or your backend URL).
-7. Deploy.
+6. **Environment Variables (required):** In Project Settings → Environment Variables, add:
+   - **Name:** `VITE_API_URL`
+   - **Value:** `https://your-backend.onrender.com/api` (your backend API base URL including `/api`)
+   - Apply to Production, Preview, Development.
+7. Redeploy after adding the variable (Vite embeds env vars at build time).
 
-The app will use `VITE_API_URL` at build time for API requests.
+> **If you get 404 on login/register:** The API URL is missing. Add `VITE_API_URL` in Vercel and trigger a new deployment.
 
 ## File structure
 

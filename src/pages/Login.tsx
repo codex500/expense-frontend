@@ -26,8 +26,12 @@ export default function Login() {
       await login(data.email, data.password);
       window.location.replace(from || '/');
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { message?: string } } };
-      setError(e?.response?.data?.message || 'Login failed');
+      const e = err as { response?: { status?: number; data?: { message?: string } } };
+      if (e?.response?.status === 404) {
+        setError('API not reachable. Ensure VITE_API_URL is set in your deployment (Vercel → Project Settings → Environment Variables).');
+      } else {
+        setError(e?.response?.data?.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
