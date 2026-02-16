@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { PageLoader } from '@/components/common/Loader';
 import { LayoutProvider } from '@/context/LayoutContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Navbar } from '@/components/layout/Navbar';
@@ -46,11 +47,12 @@ function AppLayout() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+    <React.Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-light dark:bg-dark"><PageLoader /></div>}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="analytics" element={<Analytics />} />
@@ -58,5 +60,6 @@ export default function App() {
         <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
+    </React.Suspense>
   );
 }

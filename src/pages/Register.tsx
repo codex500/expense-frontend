@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/context/AuthContext';
 import { Logo } from '@/components/ui/Logo';
@@ -11,8 +11,9 @@ type Form = { name: string; email: string; password: string; monthly_budget?: st
 export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { register: doRegister } = useAuth();
-  const navigate = useNavigate();
+  const { user, register: doRegister } = useAuth();
+
+  if (user) return <Navigate to="/" replace />;
 
   const { register, handleSubmit, formState: { errors } } = useForm<Form>();
 
@@ -28,7 +29,7 @@ export default function Register() {
         data.password,
         budget
       );
-      navigate('/', { replace: true });
+      window.location.replace('/');
     } catch (err: unknown) {
       const ax = err as { response?: { data?: { message?: string }; status?: number }; message?: string };
       const msg = ax?.response?.data?.message || ax?.message || 'Registration failed. Check your connection.';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/context/AuthContext';
 import { Logo } from '@/components/ui/Logo';
@@ -11,10 +11,11 @@ type Form = { email: string; password: string };
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { user, login } = useAuth();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+
+  if (user) return <Navigate to={from || '/'} replace />;
 
   const { register, handleSubmit, formState: { errors } } = useForm<Form>();
 
@@ -23,7 +24,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(data.email, data.password);
-      navigate(from, { replace: true });
+      window.location.replace(from || '/');
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
       setError(e?.response?.data?.message || 'Login failed');
