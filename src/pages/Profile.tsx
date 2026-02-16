@@ -17,11 +17,25 @@ export default function Profile() {
   const handleDownloadPdf = async () => {
     try {
       const [d, t] = await Promise.all([dashboardApi.summary(), transactionsApi.list()]);
-      const s = d.data.data;
-      downloadPdf(user?.name || 'User', s.total_income, s.total_expense, s.total_balance, t.data.data.transactions || []);
-      show('PDF downloaded', 'success');
-    } catch {
-      show('Download failed', 'error');
+      const s = d?.data?.data ?? {};
+      const txList = t?.data?.data?.transactions ?? [];
+      try {
+        downloadPdf(
+          user?.name || 'User',
+          user?.email || '',
+          s.total_income ?? 0,
+          s.total_expense ?? 0,
+          s.total_balance ?? 0,
+          txList
+        );
+        show('PDF downloaded', 'success');
+      } catch (pdfErr) {
+        console.error('PDF generation error:', pdfErr);
+        show('PDF generation failed', 'error');
+      }
+    } catch (apiErr) {
+      console.error('API error:', apiErr);
+      show('Could not load data for PDF', 'error');
     }
   };
 
@@ -54,25 +68,25 @@ export default function Profile() {
   };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Profile</h1>
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white">Account</h2>
-        <p className="text-slate-600 dark:text-slate-400"><span className="font-medium">Name:</span> {user?.name}</p>
-        <p className="mt-2 text-slate-600 dark:text-slate-400"><span className="font-medium">Email:</span> {user?.email}</p>
+    <div className="space-y-6 sm:space-y-8 min-w-0">
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Profile</h1>
+      <Card className="min-w-0">
+        <h2 className="mb-4 text-base sm:text-lg font-semibold text-slate-800 dark:text-white">Account</h2>
+        <p className="text-slate-600 dark:text-slate-400 break-words"><span className="font-medium">Name:</span> {user?.name}</p>
+        <p className="mt-2 text-slate-600 dark:text-slate-400 break-all"><span className="font-medium">Email:</span> {user?.email}</p>
       </Card>
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white">Monthly budget</h2>
-        <div className="flex flex-wrap items-end gap-4">
-          <Input label="Budget (₹)" type="number" step="0.01" value={budget} onChange={(e) => setBudget(e.target.value)} className="max-w-xs" />
-          <Button onClick={handleSaveBudget} loading={saving}>Update</Button>
+      <Card className="min-w-0">
+        <h2 className="mb-4 text-base sm:text-lg font-semibold text-slate-800 dark:text-white">Monthly budget</h2>
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3 sm:gap-4">
+          <Input label="Budget (₹)" type="number" step="0.01" value={budget} onChange={(e) => setBudget(e.target.value)} className="w-full sm:max-w-xs min-w-0" />
+          <Button onClick={handleSaveBudget} loading={saving} className="sm:shrink-0 min-h-[44px]">Update</Button>
         </div>
       </Card>
-      <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800 dark:text-white">Download report</h2>
-        <div className="flex gap-4">
-          <Button variant="secondary" onClick={handleDownloadPdf}>PDF</Button>
-          <Button variant="accent" onClick={handleDownloadCsv}>CSV</Button>
+      <Card className="min-w-0">
+        <h2 className="mb-4 text-base sm:text-lg font-semibold text-slate-800 dark:text-white">Download report</h2>
+        <div className="flex flex-wrap gap-3 sm:gap-4">
+          <Button variant="secondary" onClick={handleDownloadPdf} className="min-h-[44px] flex-1 sm:flex-initial">PDF</Button>
+          <Button variant="accent" onClick={handleDownloadCsv} className="min-h-[44px] flex-1 sm:flex-initial">CSV</Button>
         </div>
       </Card>
     </div>

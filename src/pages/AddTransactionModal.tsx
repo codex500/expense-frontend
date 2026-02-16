@@ -40,19 +40,19 @@ export function AddTransactionModal({ open, onClose, onSuccess }: AddTransaction
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div className="glass relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-white">Add transaction</h2>
+    <div className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="glass relative w-full max-h-[90vh] max-w-md overflow-y-auto rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 shadow-xl z-[60]" onClick={(e) => e.stopPropagation()}>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Add transaction</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Type</label>
               <div className="flex gap-2">
-                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-600 py-2.5 has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-600 py-3 min-h-[44px] has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input type="radio" value="income" {...register('type', { required: true })} className="sr-only" />
                   <span className="text-sm font-medium">Income</span>
                 </label>
-                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-600 py-2.5 has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-xl border-2 border-slate-200 dark:border-slate-600 py-3 min-h-[44px] has-[:checked]:border-primary has-[:checked]:bg-primary/10">
                   <input type="radio" value="expense" {...register('type', { required: true })} className="sr-only" />
                   <span className="text-sm font-medium">Expense</span>
                 </label>
@@ -80,8 +80,8 @@ export function AddTransactionModal({ open, onClose, onSuccess }: AddTransaction
             <Input label="Date" type="date" {...register('transaction_date')} />
             <Input label="Note" placeholder="Optional" {...register('note')} />
             <div className="flex gap-3 pt-2">
-              <Button type="button" variant="ghost" className="flex-1" onClick={onClose}>Cancel</Button>
-              <Button type="submit" className="flex-1">Add</Button>
+              <Button type="button" variant="ghost" className="flex-1 min-h-[44px]" onClick={onClose}>Cancel</Button>
+              <Button type="submit" className="flex-1 min-h-[44px]">Add</Button>
             </div>
           </form>
       </div>

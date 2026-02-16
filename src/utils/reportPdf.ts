@@ -1,24 +1,145 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import { applyPlugin } from 'jspdf-autotable';
 import type { Transaction } from '@/types';
 
-export function downloadPdf(userName: string, totalIncome: number, totalExpense: number, balance: number, transactions: Transaction[]) {
+// Ensure plugin is applied (required for jspdf-autotable v5 + jsPDF 4)
+applyPlugin(jsPDF);
+
+const PRIMARY = [99, 102, 241] as [number, number, number];   // #6366F1
+const SECONDARY = [34, 197, 94] as [number, number, number]; // #22C55E
+const ACCENT = [245, 158, 11] as [number, number, number];   // #F59E0B
+const DARK = [15, 23, 42] as [number, number, number];        // #0F172A
+const LIGHT = [248, 250, 252] as [number, number, number];   // #F8FAFC
+
+function safeNum(n: unknown): number {
+  const v = Number(n);
+  return Number.isFinite(v) ? v : 0;
+}
+
+function safeArr<T>(a: unknown): T[] {
+  return Array.isArray(a) ? a : [];
+}
+
+export function downloadPdf(
+  userName: string,
+  userEmail: string,
+  totalIncome: number,
+  totalExpense: number,
+  balance: number,
+  transactions: Transaction[] | unknown
+) {
   const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text('Trackify – Expense Report', 14, 20);
+  const totalInc = safeNum(totalIncome);
+  const totalExp = safeNum(totalExpense);
+  const bal = safeNum(balance);
+  const txs = safeArr<Transaction>(transactions);
+  const pageW = doc.getPageWidth();
+  let y = 0;
+
+  // ----- Header: Trackify logo area -----
+  doc.setFillColor(...PRIMARY);
+  doc.rect(0, 0, pageW, 32, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Trackify', 14, 20);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Expense Report', 14, 27);
+  doc.setTextColor(0, 0, 0);
+  y = 40;
+
+  // ----- User details box -----
+  doc.setFillColor(...LIGHT);
+  doc.setDrawColor(200, 200, 200);
+  doc.roundedRect(14, y, pageW - 28, 28, 2, 2, 'FD');
   doc.setFontSize(11);
-  doc.text(`User: ${userName}`, 14, 28);
-  doc.text(`Total Income: ₹${totalIncome.toLocaleString()}`, 14, 34);
-  doc.text(`Total Expense: ₹${totalExpense.toLocaleString()}`, 14, 40);
-  doc.text(`Balance: ₹${balance.toLocaleString()}`, 14, 46);
-  const head = [['Date', 'Type', 'Category', 'Amount']];
-  const body = transactions.slice(0, 50).map((t) => [
-    new Date(t.transaction_date).toLocaleDateString(),
-    t.type,
-    t.category,
-    `₹${Number(t.amount).toLocaleString()}`,
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...DARK);
+  doc.text('User Details', 20, y + 8);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(60, 60, 60);
+  doc.text(`Name: ${userName}`, 20, y + 16);
+  doc.text(`Email: ${userEmail}`, 20, y + 22);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, 110, y + 22);
+  y += 36;
+
+  // ----- Summary cards -----
+  const cardW = (pageW - 34) / 3;
+  const cards = [
+    { label: 'Total Income', value: totalInc, color: SECONDARY },
+    { label: 'Total Expense', value: totalExp, color: ACCENT },
+    { label: 'Balance', value: bal, color: bal >= 0 ? SECONDARY : ACCENT },
+  ];
+  cards.forEach((card, i) => {
+    const x = 14 + i * (cardW + 2);
+    doc.setFillColor(240, 240, 240);
+    doc.roundedRect(x, y, cardW, 22, 1.5, 1.5, 'F');
+    doc.setDrawColor(220, 220, 220);
+    doc.roundedRect(x, y, cardW, 22, 1.5, 1.5, 'D');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(card.label, x + 6, y + 8);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...card.color);
+    doc.text(`₹${card.value.toLocaleString()}`, x + 6, y + 18);
+    doc.setTextColor(0, 0, 0);
+  });
+  y += 30;
+
+  // ----- Transactions table -----
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...DARK);
+  doc.text('Recent Transactions', 14, y + 6);
+  y += 12;
+
+  const head = [['Date', 'Type', 'Category', 'Payment', 'Amount']];
+  const body = txs.slice(0, 50).map((t) => [
+    t.transaction_date ? new Date(t.transaction_date).toLocaleDateString() : '—',
+    t.type || '—',
+    t.category || '—',
+    t.payment_method || '—',
+    `${t.type === 'income' ? '+' : '-'} ₹${safeNum(t.amount).toLocaleString()}`,
   ]);
-  (doc as unknown as { autoTable: (o: { head: string[][]; body: string[][]; startY: number; styles: { fontSize: number } }) => void })
-    .autoTable({ head, body, startY: 54, styles: { fontSize: 9 } });
-  doc.save('trackify-report.pdf');
+
+  doc.autoTable({
+    head,
+    body,
+    startY: y,
+    margin: { left: 14, right: 14 },
+    headStyles: {
+      fillColor: PRIMARY,
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 9,
+    },
+    bodyStyles: { fontSize: 8, textColor: [40, 40, 40] },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    columnStyles: {
+      0: { cellWidth: 24 },
+      1: { cellWidth: 22 },
+      2: { cellWidth: 35 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 38 },
+    },
+    theme: 'grid',
+  });
+
+  const lastTable = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable;
+  const finalY = (typeof lastTable?.finalY === 'number' ? lastTable.finalY : y + 20) ?? y + 20;
+  if (finalY > 270) {
+    doc.addPage();
+    doc.setFontSize(9);
+    doc.setTextColor(120, 120, 120);
+    doc.text('— Report generated by Trackify —', pageW / 2, 14, { align: 'center' });
+  } else {
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('— Report generated by Trackify —', pageW / 2, doc.getPageHeight() - 10, { align: 'center' });
+  }
+
+  doc.save(`trackify-report-${new Date().toISOString().slice(0, 10)}.pdf`);
 }

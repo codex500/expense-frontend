@@ -33,13 +33,13 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-primary/5 dark:from-dark dark:via-slate-900 dark:to-primary/10 p-4">
-      <div className="w-full max-w-md">
-        <div className="glass rounded-2xl p-8 shadow-xl">
-          <div className="mb-8 flex justify-center">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-primary/5 dark:from-dark dark:via-slate-900 dark:to-primary/10 p-4 sm:p-6">
+      <div className="w-full max-w-md min-w-0">
+        <div className="glass rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div className="mb-6 sm:mb-8 flex justify-center">
             <Logo />
           </div>
-          <h1 className="mb-2 text-center text-2xl font-bold text-slate-800 dark:text-white">Welcome back</h1>
+          <h1 className="mb-2 text-center text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Welcome back</h1>
           <p className="mb-6 text-center text-slate-500 dark:text-slate-400">Sign in to Trackify</p>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input label="Email" type="email" placeholder="you@example.com" error={errors.email?.message} {...register('email', { required: 'Email is required' })} />

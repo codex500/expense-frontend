@@ -29,13 +29,13 @@ export default function Advisor() {
   if (loading) return <Loader className="min-h-[60vh]" />;
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Advisor</h1>
-      <p className="text-slate-600 dark:text-slate-400">Smart insights from your spending patterns.</p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-6 sm:space-y-8 min-w-0">
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Advisor</h1>
+      <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">Smart insights from your spending patterns.</p>
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {insights.map((ins, i) => (
-          <Card key={i} className={`border-l-4 ${typeStyles[ins.type]}`}>
-            <h3 className="font-semibold text-slate-800 dark:text-white">{ins.title}</h3>
+          <Card key={i} className={`border-l-4 min-w-0 ${typeStyles[ins.type]}`}>
+            <h3 className="font-semibold text-slate-800 dark:text-white text-base sm:text-lg">{ins.title}</h3>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{ins.message}</p>
           </Card>
         ))}

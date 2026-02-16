@@ -26,14 +26,14 @@ export default function Analytics() {
   if (loading) return <Loader className="min-h-[60vh]" />;
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Analytics</h1>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ChartCard title="By category">
-          <div className="h-80">
+    <div className="space-y-6 sm:space-y-8 min-w-0">
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Analytics</h1>
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <ChartCard title="By category" className="min-w-0">
+          <div className="h-56 sm:h-72 lg:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={category} dataKey="total" nameKey="category" cx="50%" cy="50%" outerRadius={100} label={({ category: c, total }) => `${c}: ₹${total}`}>
+                <Pie data={category} dataKey="total" nameKey="category" cx="50%" cy="50%" outerRadius="70%" label={({ category: c, total }) => `${c}: ₹${total}`}>
                   {category.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip formatter={(v: number) => `₹${v.toLocaleString()}`} />
@@ -41,12 +41,12 @@ export default function Analytics() {
             </ResponsiveContainer>
           </div>
         </ChartCard>
-        <ChartCard title="Monthly (6 months)">
-          <div className="h-80">
+        <ChartCard title="Monthly (6 months)" className="min-w-0">
+          <div className="h-56 sm:h-72 lg:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthly}>
-                <XAxis dataKey="month" />
-                <YAxis />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(v: number) => [`₹${v.toLocaleString()}`]} />
                 <Bar dataKey="total" fill="#6366F1" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -54,12 +54,12 @@ export default function Analytics() {
           </div>
         </ChartCard>
       </div>
-      <ChartCard title="Last 7 days">
-        <div className="h-80">
+      <ChartCard title="Last 7 days" className="min-w-0">
+        <div className="h-56 sm:h-72 lg:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={weekly}>
-              <XAxis dataKey="day" />
-              <YAxis />
+              <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
               <Tooltip formatter={(v: number) => [`₹${v.toLocaleString()}`]} />
               <Line type="monotone" dataKey="total" stroke="#22C55E" strokeWidth={2} />
             </LineChart>

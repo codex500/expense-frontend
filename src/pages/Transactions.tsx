@@ -50,11 +50,11 @@ export default function Transactions() {
     : transactions;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Transactions</h1>
-      <div className="flex flex-wrap items-center gap-4">
-        <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-xs" />
-        <select value={type} onChange={(e) => setType(e.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm">
+    <div className="space-y-4 sm:space-y-6 min-w-0">
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Transactions</h1>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+        <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:max-w-xs min-w-0" />
+        <select value={type} onChange={(e) => setType(e.target.value)} className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2.5 text-sm min-h-[44px] w-full sm:w-auto sm:min-w-[120px]">
           <option value="">All types</option>
           <option value="income">Income</option>
           <option value="expense">Expense</option>
@@ -64,7 +64,7 @@ export default function Transactions() {
           placeholder="Category filter"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-sm w-40"
+          className="rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 px-4 py-2.5 text-sm min-h-[44px] w-full sm:w-40 min-w-0"
         />
       </div>
       <TransactionTable transactions={filtered} onDelete={handleDelete} loading={loading} />

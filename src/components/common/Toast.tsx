@@ -9,7 +9,7 @@ const styles: Record<ToastType, string> = {
 
 export function Toast({ message, type }: { message: string; type: ToastType }) {
   return (
-    <div className={`fixed bottom-6 right-6 z-50 rounded-xl px-4 py-3 shadow-lg transition-all duration-300 ${styles[type]}`}>
+    <div className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-auto z-[60] max-w-sm sm:max-w-md rounded-xl px-4 py-3 shadow-lg transition-all duration-300 ${styles[type]}`}>
       {message}
     </div>
   );

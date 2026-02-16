@@ -1,7 +1,7 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Logo } from '@/components/ui/Logo';
+import { useLayout } from '@/context/LayoutContext';
 import { useTheme } from '@/context/ThemeContext';
+import { Logo } from '@/components/ui/Logo';
 
 const links = [
   { to: '/', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -11,50 +11,77 @@ const links = [
   { to: '/profile', label: 'Profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
 ];
 
-export function Sidebar() {
+function SidebarContent() {
   const { theme, toggleTheme } = useTheme();
+  const { setSidebarOpen } = useLayout();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200/80 dark:border-slate-700/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
-      <div className="flex h-full flex-col">
-        <div className="flex h-16 items-center gap-2 border-b border-slate-200/80 dark:border-slate-700/80 px-6">
-          <Logo />
-        </div>
-        <nav className="flex-1 space-y-1 p-4">
-          {links.map(({ to, label, icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-                }`
-              }
-            >
-              <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-              </svg>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="border-t border-slate-200/80 dark:border-slate-700/80 p-4">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            {theme === 'dark' ? (
-              <span className="text-lg">☀️</span>
-            ) : (
-              <span className="text-lg">🌙</span>
-            )}
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          </button>
-        </div>
+    <>
+      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+        <Logo />
       </div>
-    </aside>
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3 sm:p-4">
+        {links.map(({ to, label, icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `flex min-h-[44px] items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                isActive
+                  ? 'bg-primary/10 text-primary dark:bg-primary/20'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+              }`
+            }
+          >
+            <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+            </svg>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+      <div className="border-t border-slate-200/80 dark:border-slate-700/80 p-3 sm:p-4">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="flex w-full min-h-[44px] items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          {theme === 'dark' ? <span className="text-lg">☀️</span> : <span className="text-lg">🌙</span>}
+          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        </button>
+      </div>
+    </>
+  );
+}
+
+export function Sidebar() {
+  const { sidebarOpen, setSidebarOpen } = useLayout();
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden"
+        style={{ opacity: sidebarOpen ? 1 : 0, pointerEvents: sidebarOpen ? 'auto' : 'none' }}
+        onClick={() => setSidebarOpen(false)}
+      />
+      {/* Sidebar: drawer on mobile, fixed on lg+ */}
+      <aside
+        className={`
+          fixed left-0 top-0 z-50 h-screen w-64 max-w-[85vw] border-r border-slate-200/80 dark:border-slate-700/80
+          bg-white dark:bg-slate-900 backdrop-blur-xl
+          flex flex-col
+          transition-transform duration-300 ease-out
+          lg:translate-x-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <div className="flex h-full flex-col">
+          <SidebarContent />
+        </div>
+      </aside>
+    </>
   );
 }
