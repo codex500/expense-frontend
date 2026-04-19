@@ -171,7 +171,7 @@ export function Signup() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Date of Birth</label>
+                <label className="text-sm font-medium">Date of Birth (DD-MM-YYYY)</label>
                 <div className="relative">
                   <input 
                     type="date" 
@@ -179,6 +179,7 @@ export function Signup() {
                     onChange={(e) => setDob(e.target.value)}
                     required
                     max={new Date().toISOString().split('T')[0]} // Prevents future dates
+                    lang="en-GB"
                     className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm transition-all text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary [color-scheme:dark]"
                   />
                 </div>

@@ -174,10 +174,11 @@ export function Settings() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* DOB - Editable */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> Date of Birth</label>
+                    <label className="text-sm font-medium flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /> Date of Birth (DD-MM-YYYY)</label>
                     <input
                       type="date" value={dob} onChange={(e) => setDob(e.target.value)}
                       max={new Date().toISOString().split('T')[0]}
+                      lang="en-GB"
                       className="h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 [color-scheme:dark]"
                     />
                   </div>
@@ -206,16 +207,19 @@ export function Settings() {
                     <label className="text-sm font-medium flex items-center gap-2">
                       <Shield className="h-4 w-4 text-muted-foreground" /> Gender
                     </label>
-                    <select
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      className="h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
-                    >
-                      <option value="" disabled>Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        className="h-12 w-full appearance-none rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      >
+                        <option value="" disabled>Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
                   {/* PAN - Read Only */}
                   <div className="space-y-2">
