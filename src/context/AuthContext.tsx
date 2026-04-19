@@ -7,7 +7,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, monthly_budget?: number) => Promise<void>;
+  register: (name: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string, panCard?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -29,7 +29,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       const { data } = await authApi.me();
-      setUser(data.data.user);
+      // Backend GET /auth/session returns: { success, data: { id, email, fullName, ... } }
+      const sessionData = data.data;
+      setUser({
+        id: sessionData.id,
+        email: sessionData.email,
+        fullName: sessionData.fullName,
+        emailVerified: sessionData.emailVerified,
+        defaultCurrency: sessionData.defaultCurrency,
+        onboardingCompleted: sessionData.onboardingCompleted,
+        accountCount: sessionData.accountCount,
+      });
       setToken(t);
     } catch {
       localStorage.removeItem('token');
@@ -57,20 +67,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { data } = await authApi.login(email, password);
-    const { user: u, token: t } = data.data;
-    localStorage.setItem('token', t);
-    localStorage.setItem('user', JSON.stringify(u));
-    setUser(u);
-    setToken(t);
+    // Backend POST /auth/login returns:
+    // { success, data: { user: {...}, session: { accessToken, refreshToken, expiresAt }, onboardingCompleted, salaryPendingForMonth } }
+    const result = data.data;
+    const accessToken = result.session.accessToken;
+    const userData: User = result.user;
+
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    setToken(accessToken);
   };
 
-  const register = async (name: string, email: string, password: string, monthly_budget?: number) => {
-    const { data } = await authApi.register(name, email, password, monthly_budget);
-    const { user: u, token: t } = data.data;
-    localStorage.setItem('token', t);
-    localStorage.setItem('user', JSON.stringify(u));
-    setUser(u);
-    setToken(t);
+  const register = async (name: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string, panCard?: string) => {
+    // Registration returns success message, user needs to verify email before login
+    await authApi.register(name, email, password, dob, gender, mobileNumber, panCard);
   };
 
   const logout = () => {

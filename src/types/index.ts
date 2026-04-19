@@ -1,58 +1,95 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
-  monthly_budget: number;
-  created_at?: string;
+  fullName: string;
+  dob?: string;
+  gender?: string;
+  mobileNumber?: string;
+  emailVerified?: boolean;
+  defaultCurrency?: string;
+  themePreference?: string;
+  onboardingCompleted?: boolean;
+  accountCount?: number;
+}
+
+export interface Session {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+}
+
+export interface LoginResponse {
+  user: User;
+  session: Session;
+  onboardingCompleted: boolean;
+  salaryPendingForMonth: boolean;
 }
 
 export interface Transaction {
   id: string;
-  user_id: string;
-  type: 'income' | 'expense';
-  amount: number;
+  userId: string;
+  accountId: string;
+  type: 'income' | 'expense' | 'transfer';
+  amountPaise: number;
   category: string;
-  payment_method: string | null;
   note: string | null;
-  transaction_date: string;
-  created_at: string;
+  transactionDate: string;
+  createdAt: string;
+}
+
+export interface Account {
+  id: string;
+  accountName: string;
+  type: 'cash' | 'upi' | 'bank_account' | 'credit_card' | 'wallet';
+  currentBalancePaise: number;
+  icon?: string;
+  color?: string;
+  isDefault?: boolean;
+}
+
+export interface AccountSummary {
+  totalAccounts: number;
+  totalBalancePaise: number;
+  byType: Record<string, number>;
 }
 
 export interface DashboardSummary {
-  total_balance: number;
-  total_income: number;
-  total_expense: number;
-  monthly_expense: number;
-  todays_expense: number;
+  currentMonth: {
+    incomePaise: number;
+    expensePaise: number;
+    savingsPaise: number;
+  };
+  trends: {
+    expenseChange: number;
+  };
 }
 
 export interface BudgetStatus {
-  monthly_budget: number;
-  monthly_expense: number;
-  percent_used: number;
-  warning: string | null;
+  scope: string;
+  category?: string;
+  amountPaise: number;
+  spentPaise: number;
+  percentUsed: number;
+  status: string;
+  alert90Sent?: boolean;
 }
 
 export interface CategoryExpense {
   category: string;
-  total: number;
+  amountPaise: number;
 }
 
-export interface MonthlySpending {
-  month: string;
-  total: number;
-}
-
-export interface DailySpending {
-  day: string;
-  total: number;
+export interface AdvisorInsights {
+  insights: string[];
+  warnings: string[];
+  suggestions: string[];
 }
 
 export interface AddTransactionInput {
   type: 'income' | 'expense';
-  amount: number;
+  amountPaise: number;
   category: string;
-  payment_method?: string;
+  accountId: string;
   note?: string;
-  transaction_date: string;
+  transactionDate: string;
 }

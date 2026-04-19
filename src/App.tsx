@@ -1,65 +1,108 @@
-import React, { useState } from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { PageLoader } from '@/components/common/Loader';
-import { LayoutProvider } from '@/context/LayoutContext';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Navbar } from '@/components/layout/Navbar';
-import { AddTransactionModal } from '@/pages/AddTransactionModal';
-
-const Login = React.lazy(() => import('@/pages/Login'));
-const Register = React.lazy(() => import('@/pages/Register'));
-const ForgotPassword = React.lazy(() => import('@/pages/ForgotPassword'));
-const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
-const Transactions = React.lazy(() => import('@/pages/Transactions'));
-const Analytics = React.lazy(() => import('@/pages/Analytics'));
-const Advisor = React.lazy(() => import('@/pages/Advisor'));
-const Profile = React.lazy(() => import('@/pages/Profile'));
-
-function AppLayout() {
-  const [addOpen, setAddOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  return (
-    <LayoutProvider>
-      <div className="flex min-h-screen min-w-0 overflow-x-hidden">
-        <Sidebar />
-        <div className="flex flex-1 flex-col min-w-0 lg:pl-64">
-          <Navbar />
-          <main className="flex-1 p-4 sm:p-6 pb-24 sm:pb-8">
-            <React.Suspense fallback={<div className="flex min-h-[60vh] items-center justify-center">Loading...</div>}>
-              <Outlet context={{ refreshKey }} />
-            </React.Suspense>
-          </main>
-        </div>
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-30 flex h-14 w-14 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-primary text-white text-2xl font-light shadow-lg shadow-primary/40 transition hover:scale-105 active:scale-95"
-          aria-label="Add transaction"
-        >
-          +
-        </button>
-        <AddTransactionModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={() => setRefreshKey((k) => k + 1)} />
-      </div>
-    </LayoutProvider>
-  );
+import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { PublicLayout } from '@/components/layout/PublicLayout';
+import { Dashboard } from '@/pages/Dashboard';
+import { Login } from '@/pages/Login';
+import { Signup } from '@/pages/Signup';
+import { ForgotPassword } from '@/pages/ForgotPassword';
+import { ResetPassword } from '@/pages/ResetPassword';
+import { VerifyEmail } from '@/pages/VerifyEmail';
+import { Transactions } from '@/pages/Transactions';
+import { Accounts } from '@/pages/Accounts';
+import { Budgets } from '@/pages/Budgets';
+import { Advisor } from '@/pages/Advisor';
+import { Analytics } from '@/pages/Analytics';
+import { Home } from '@/pages/Home';
+import { About } from '@/pages/About';
+import { ContactUs } from '@/pages/ContactUs';
+import { useAuth } from '@/context/AuthContext';
+import { Settings } from '@/pages/Settings';
+import { Support } from '@/pages/Support';
+import { Toaster } from 'sonner';function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { token, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading...</div>;
+  }
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
 }
 
-export default function App() {
+function PublicRoute({ children }: { children?: React.ReactNode }) {
+  const { token, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading...</div>;
+  }
+  
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children ? <>{children}</> : <Outlet />;
+}
+
+function App() {
   return (
-    <React.Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-light dark:bg-dark"><PageLoader /></div>}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-        <Route index element={<Dashboard />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="advisor" element={<Advisor />} />
-        <Route path="profile" element={<Profile />} />
+    <Routes>
+      {/* Public Marketing Routes */}
+      <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
       </Route>
+      
+      {/* Auth Routes */}
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+      </Route>
+      
+      {/* Protected Routes inside AppLayout */}
+      <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+      <Route path="/transactions" element={<ProtectedRoute><AppLayout><Transactions /></AppLayout></ProtectedRoute>} />
+      <Route path="/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
+      <Route path="/budgets" element={<ProtectedRoute><AppLayout><Budgets /></AppLayout></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><AppLayout><Analytics /></AppLayout></ProtectedRoute>} />
+      <Route path="/advisor" element={<ProtectedRoute><AppLayout><Advisor /></AppLayout></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+      <Route path="/support" element={<ProtectedRoute><AppLayout><Support /></AppLayout></ProtectedRoute>} />
+      
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    </React.Suspense>
   );
 }
+
+// Wrapper to catch Supabase hash links at root
+function AppWrapper() {
+  useState(() => {
+    // Intercept Supabase default recovery links
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      if (params.get('type') === 'recovery' && params.get('access_token')) {
+        window.location.href = `/reset-password#${hash}`;
+      } else if (params.get('type') === 'signup' && params.get('access_token')) {
+        window.location.href = `/verify-email#${hash}`;
+      }
+    }
+  });
+  
+  return (
+    <>
+      <Toaster position="top-right" richColors theme="system" />
+      <App />
+    </>
+  );
+}
+
+export default AppWrapper;

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { transactionsApi } from '@/api/endpoints';
+import { useAccounts } from '@/hooks/useQueries';
 import type { AddTransactionInput } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -15,20 +16,23 @@ const categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', '
 const paymentMethods = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
 
 export function AddTransactionModal({ open, onClose, onSuccess }: AddTransactionModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<AddTransactionInput & { amount: string }>({
-    defaultValues: { type: 'expense', transaction_date: new Date().toISOString().slice(0, 10) },
+  const { data: accountsData } = useAccounts();
+  const accounts = accountsData || [];
+  
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<AddTransactionInput & { amount: string, accountId: string }>({
+    defaultValues: { type: 'expense', transactionDate: new Date().toISOString().slice(0, 10) },
   });
   useEffect(() => { if (!open) reset(); }, [open, reset]);
 
-  const onSubmit = async (data: AddTransactionInput & { amount: string }) => {
+  const onSubmit = async (data: AddTransactionInput & { amount: string, accountId: string, transactionDate: string }) => {
     try {
       await transactionsApi.create({
         type: data.type,
-        amount: Number(data.amount),
+        amountPaise: Math.round(Number(data.amount) * 100),
         category: data.category,
-        payment_method: data.payment_method || undefined,
+        accountId: data.accountId,
         note: data.note || undefined,
-        transaction_date: data.transaction_date || new Date().toISOString().slice(0, 10),
+        transactionDate: data.transactionDate || new Date().toISOString().slice(0, 10),
       });
       reset();
       onClose();
@@ -69,15 +73,15 @@ export function AddTransactionModal({ open, onClose, onSuccess }: AddTransaction
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Payment method</label>
-              <select {...register('payment_method')} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none">
-                <option value="">Select</option>
-                {paymentMethods.map((m) => (
-                  <option key={m} value={m}>{m}</option>
+              <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Account</label>
+              <select {...register('accountId', { required: true })} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none">
+                <option value="">Select Account</option>
+                {accounts.map((m: any) => (
+                  <option key={m.id} value={m.id}>{m.accountName || m.account_name}</option>
                 ))}
               </select>
             </div>
-            <Input label="Date" type="date" {...register('transaction_date')} />
+            <Input label="Date" type="date" {...register('transactionDate', { required: true })} />
             <Input label="Note" placeholder="Optional" {...register('note')} />
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="ghost" className="flex-1 min-h-[44px]" onClick={onClose}>Cancel</Button>
