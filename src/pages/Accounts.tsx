@@ -4,6 +4,8 @@ import { Wallet2, Landmark, CreditCard, Smartphone, Plus, X, TrendingUp, Edit3, 
 import { useAccounts } from '@/hooks/useQueries';
 import { accountsApi } from '@/api/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 function formatPaise(paise: number): string {
   return (paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -33,16 +35,19 @@ export function Accounts() {
   const [editingAccount, setEditingAccount] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  const handleDeleteAccount = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete account "${name}"? This will also delete all associated transactions. This action cannot be undone.`)) {
-      try {
-        await accountsApi.delete(id);
-        queryClient.invalidateQueries({ queryKey: ['accounts'] });
-        queryClient.invalidateQueries({ queryKey: ['accountSummary'] });
-        refetch();
-      } catch (err: any) {
-        alert(err?.response?.data?.message || 'Failed to delete account.');
-      }
+  const [deleteAccountId, setDeleteAccountId] = useState<{ id: string; name: string } | null>(null);
+
+  const handleDeleteAccount = async (id: string) => {
+    try {
+      await accountsApi.delete(id);
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['accountSummary'] });
+      toast.success('Account deleted successfully!');
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to delete account.');
+    } finally {
+      setDeleteAccountId(null);
     }
   };
 
@@ -60,6 +65,15 @@ export function Accounts() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
+      <ConfirmDialog
+        isOpen={!!deleteAccountId}
+        onClose={() => setDeleteAccountId(null)}
+        onConfirm={() => {
+          if (deleteAccountId) handleDeleteAccount(deleteAccountId.id);
+        }}
+        title="Delete Account"
+        message={`Are you sure you want to delete account "${deleteAccountId?.name}"? This will also delete all associated transactions. This action cannot be undone.`}
+      />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight">Accounts</h2>
@@ -100,7 +114,7 @@ export function Accounts() {
             const name = account.accountName || account.account_name;
             const bank = account.bankName || account.bank_name;
             return (
-              <motion.div key={account.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+              <motion.div key={account.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
                 className="glass-card rounded-2xl overflow-hidden hover:glow-primary transition-all group">
                 <div className={`h-2 bg-gradient-to-r ${ACCOUNT_GRADIENTS[type] || 'from-primary/20 to-violet-500/10'}`} />
                 <div className="p-6">
@@ -125,7 +139,9 @@ export function Accounts() {
                   </div>
                   <div className="flex justify-end gap-2 pt-3 border-t border-border/50">
                     <button onClick={() => setEditingAccount(account)} className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"><Edit3 className="h-4 w-4" /></button>
-                    <button onClick={() => handleDeleteAccount(account.id, name)} className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteAccountId({ id: account.id, name: account.accountName || account.account_name }); }} className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors z-10" aria-label="Delete Account">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
               </motion.div>

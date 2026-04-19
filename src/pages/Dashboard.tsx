@@ -70,7 +70,7 @@ export function Dashboard() {
             key={card.label}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
+            
             className={`glass-card rounded-2xl p-6 bg-gradient-to-br ${card.gradient}`}
           >
             <div className="flex flex-row items-center justify-between pb-2">
@@ -96,7 +96,7 @@ export function Dashboard() {
         ))}
 
         <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl p-6 relative overflow-hidden group bg-gradient-to-br from-primary/10 to-primary/5"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -118,7 +118,7 @@ export function Dashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl col-span-4 p-6"
         >
           <div className="flex flex-col space-y-1.5 pb-6">
@@ -148,7 +148,7 @@ export function Dashboard() {
         </motion.div>
 
         <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl col-span-3 p-6 flex flex-col"
         >
           <div className="flex flex-col space-y-1.5 pb-6">

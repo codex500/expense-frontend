@@ -132,7 +132,7 @@ export function Analytics() {
 
         {/* Weekly Trend */}
         <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl p-6 lg:col-span-2 flex flex-col"
         >
            <div className="flex justify-between items-end mb-6">
@@ -167,7 +167,7 @@ export function Analytics() {
         
         {/* Monthly Trend (Area Chart) */}
         <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl p-6 lg:col-span-3 flex flex-col mt-6"
         >
            <div className="flex justify-between items-end mb-6">

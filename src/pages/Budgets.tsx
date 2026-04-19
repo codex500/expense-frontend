@@ -4,6 +4,8 @@ import { CreditCard, AlertTriangle, CheckCircle2, Plus, X } from 'lucide-react';
 import { useBudgets } from '@/hooks/useQueries';
 import { budgetsApi } from '@/api/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { toast } from 'sonner';
 
 function formatPaise(paise: number): string {
   return (paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -18,13 +20,17 @@ export function Budgets() {
 
   const budgetList = Array.isArray(budgets) ? budgets : budgets?.budgets || [];
 
+  const [deleteBudgetId, setDeleteBudgetId] = useState<string | null>(null);
+
   const handleDeleteBudget = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this budget?')) return;
     try {
       await budgetsApi.delete(id);
+      toast.success('Budget deleted successfully!');
       refetch();
     } catch (err: any) {
-      alert(err?.response?.data?.message || 'Failed to delete budget.');
+      toast.error(err?.response?.data?.message || 'Failed to delete budget.');
+    } finally {
+      setDeleteBudgetId(null);
     }
   };
 
@@ -42,6 +48,15 @@ export function Budgets() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
+      <ConfirmDialog
+        isOpen={!!deleteBudgetId}
+        onClose={() => setDeleteBudgetId(null)}
+        onConfirm={() => {
+          if (deleteBudgetId) handleDeleteBudget(deleteBudgetId);
+        }}
+        title="Delete Budget"
+        message="Are you sure you want to delete this budget?"
+      />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight">Budgets</h2>
@@ -81,7 +96,7 @@ export function Budgets() {
 
       {/* Budget Cards */}
       {budgetList.length === 0 ? (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
           className="glass-card rounded-2xl p-12 text-center">
           <CreditCard className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No budgets set</h3>
@@ -96,7 +111,7 @@ export function Budgets() {
             const remaining = Math.max(amountPaise - spentPaise, 0);
             const status = budget.status || (percentUsed > 100 ? 'exceeded' : percentUsed > 80 ? 'warning' : 'ok');
             return (
-              <motion.div key={budget.id || idx} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + idx * 0.05 }}
+              <motion.div key={budget.id || idx} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
                 className="glass-card rounded-2xl p-6 hover:glow-primary transition-all group">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -112,7 +127,7 @@ export function Budgets() {
                     <button onClick={() => setEditingBudget(budget)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/50 hover:text-foreground">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                     </button>
-                    <button onClick={() => handleDeleteBudget(budget.id)} className="p-1.5 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                    <button onClick={() => setDeleteBudgetId(budget.id)} className="px-3 py-1.5 text-xs font-medium rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                     </button>
                   </div>

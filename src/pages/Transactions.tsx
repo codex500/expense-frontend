@@ -47,8 +47,9 @@ export function Transactions() {
     }
   };
 
+  const [deleteTxnId, setDeleteTxnId] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this transaction?')) return;
     setDeletingId(id);
     try {
       await transactionsApi.delete(id);
@@ -60,11 +61,21 @@ export function Transactions() {
       toast.error('Failed to delete transaction: ' + (err?.response?.data?.message || 'Server error'));
     } finally {
       setDeletingId(null);
+      setDeleteTxnId(null);
     }
   };
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
+      <ConfirmDialog
+        isOpen={!!deleteTxnId}
+        onClose={() => setDeleteTxnId(null)}
+        onConfirm={() => {
+          if (deleteTxnId) handleDelete(deleteTxnId);
+        }}
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction?"
+      />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight">Transactions</h2>
@@ -143,7 +154,7 @@ export function Transactions() {
                     const date = txn.transactionDate || txn.transaction_date;
                     return (
                       <motion.tr 
-                        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.03 }}
+                        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} 
                         key={txn.id} className="hover:bg-muted/20 transition-colors"
                       >
                         <td className="px-4 py-4">
@@ -201,7 +212,7 @@ export function Transactions() {
                         {txn.type === 'expense' ? '-' : '+'}₹{formatPaise(amountPaise)}
                       </div>
                       <button
-                        onClick={() => handleDelete(txn.id)}
+                        onClick={() => setDeleteTxnId(txn.id)}
                         disabled={deletingId === txn.id}
                         className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all flex items-center justify-center disabled:opacity-50"
                       >

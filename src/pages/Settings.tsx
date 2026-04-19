@@ -5,11 +5,14 @@ import { useAuth } from '@/context/AuthContext';
 import { useThemeStore } from '@/store/themeStore';
 import { authApi } from '@/api/endpoints';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
+import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Settings() {
   const { user, logout, refreshUser } = useAuth();
   const { theme, setTheme } = useThemeStore();
   const [activeSection, setActiveSection] = useState<string>('profile');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Profile edit state
   const [fullName, setFullName] = useState('');
@@ -82,6 +85,21 @@ export function Settings() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-20">
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          try {
+            await authApi.deleteAccount();
+            logout();
+          } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'Failed to delete account.');
+          }
+        }}
+        title="Delete Account"
+        message="Are you absolutely sure you want to delete your account? All your personal data, accounts, transactions, and budgets will be permanently wiped. This action cannot be undone."
+        confirmText="Delete Account"
+      />
       <div>
         <h2 className="text-3xl font-extrabold tracking-tight">Settings</h2>
         <p className="text-muted-foreground mt-1">Manage your account preferences.</p>
@@ -343,16 +361,7 @@ export function Settings() {
                     </p>
                   </div>
                   <button
-                    onClick={async () => {
-                      if (window.confirm('Are you absolutely sure you want to delete your account? All your data will be permanently wiped. This action cannot be undone.')) {
-                        try {
-                          await authApi.deleteAccount();
-                          logout();
-                        } catch (err: any) {
-                          alert(err?.response?.data?.message || 'Failed to delete account.');
-                        }
-                      }
-                    }}
+                    onClick={() => setIsDeleteDialogOpen(true)}
                     className="shrink-0 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
                   >
                     Delete Account
