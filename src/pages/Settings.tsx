@@ -16,6 +16,8 @@ export function Settings() {
   const [dob, setDob] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [gender, setGender] = useState('');
+  const [panCard, setPanCard] = useState('Not provided');
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -28,6 +30,8 @@ export function Settings() {
         const p = data.data;
         setFullName(p.fullName || '');
         setDob(p.dob ? p.dob.split('T')[0] : '');
+        setGender(p.gender || '');
+        setPanCard(p.panCard || 'Not provided');
         const rawMobile = p.mobileNumber || '';
         const match = rawMobile.match(/^(\+\d{1,4})\s+(.+)$/);
         if (match) {
@@ -47,7 +51,7 @@ export function Settings() {
     setProfileLoading(true);
     try {
       const fullMobile = `${countryCode} ${mobileNumber.replace(/^\+?\d+\s*/, '')}`;
-      await authApi.updateProfile({ fullName, dob, mobileNumber: fullMobile });
+      await authApi.updateProfile({ fullName, dob, mobileNumber: fullMobile, gender });
       setProfileSuccess('Profile updated successfully!');
       refreshUser();
       setTimeout(() => setProfileSuccess(''), 3000);
@@ -177,20 +181,33 @@ export function Settings() {
                   </div>
                 </div>
 
-                {/* Gender & PAN - Read Only */}
+                {/* Gender & PAN */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Gender - Editable */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2"><Shield className="h-4 w-4 text-muted-foreground" /> Gender <span className="text-xs text-muted-foreground font-normal">(Read only)</span></label>
-                    <input
-                      type="text" value={(user as any)?.gender || 'Not set'} readOnly
-                      className="h-12 w-full rounded-xl border border-input bg-muted/30 px-4 text-sm text-muted-foreground cursor-not-allowed capitalize"
-                    />
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-muted-foreground" /> Gender
+                    </label>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                    >
+                      <option value="" disabled>Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
+                  {/* PAN - Read Only */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2"><Lock className="h-4 w-4 text-muted-foreground" /> PAN Card <span className="text-xs text-muted-foreground font-normal">(Encrypted)</span></label>
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Lock className="h-4 w-4 text-muted-foreground" /> PAN Card
+                      <span className="text-xs text-muted-foreground font-normal">(Read only)</span>
+                    </label>
                     <input
-                      type="text" value="••••••••••" readOnly
-                      className="h-12 w-full rounded-xl border border-input bg-muted/30 px-4 text-sm text-muted-foreground cursor-not-allowed"
+                      type="text" value={panCard} readOnly
+                      className="h-12 w-full rounded-xl border border-input bg-muted/30 px-4 text-sm text-muted-foreground cursor-not-allowed uppercase"
                     />
                   </div>
                 </div>
