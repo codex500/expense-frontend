@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, ArrowRight, User, Eye, EyeOff, AlertCircle, CheckCircle2, Phone, CreditCard, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
+import { SEO } from '@/components/ui/SEO';
 
 export function Signup() {
   const [fullName, setFullName] = useState('');
@@ -55,6 +56,10 @@ export function Signup() {
 
   return (
     <div className="min-h-screen w-full flex bg-background">
+      <SEO 
+        title="Sign Up" 
+        description="Create your Trackify account today. Join thousands of users who are taking control of their personal finances, tracking expenses, and setting smart budgets." 
+      />
       {/* Left side - Branding */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-violet-500/5 to-blue-500/10 z-0" />

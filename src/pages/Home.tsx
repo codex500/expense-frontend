@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, BarChart3, ShieldCheck, Zap, Sparkles, TrendingUp, Wallet, PieChart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SEO } from '@/components/ui/SEO';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -10,6 +11,10 @@ const fadeUp = {
 export function Home() {
   return (
     <div className="flex flex-col animate-fade-in relative overflow-hidden">
+      <SEO 
+        title="Premium Expense & Budget Tracker" 
+        description="Take control of your personal finances with Trackify. Set intelligent budgets, monitor your spending across multiple accounts, and generate insightful analytics." 
+      />
       {/* Background Ambient Orbs */}
       <div className="absolute top-0 inset-x-0 h-[900px] w-full bg-gradient-to-b from-indigo-500/[0.07] via-background to-background pointer-events-none -z-10" />
       <div className="absolute top-20 right-[-200px] w-[700px] h-[700px] bg-indigo-500/15 rounded-full blur-[160px] pointer-events-none -z-10 opacity-50" />

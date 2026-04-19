@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, MapPin, Send, Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 
 import { contactApi } from '@/api/endpoints';
+import { SEO } from '@/components/ui/SEO';
 
 export function ContactUs() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: 'General Support Question', message: '' });
@@ -24,6 +25,10 @@ export function ContactUs() {
 
   return (
     <div className="animate-fade-in flex flex-col relative overflow-hidden">
+      <SEO 
+        title="Contact Us" 
+        description="Get in touch with the Trackify support team. We're here to answer any questions about our expense tracker and financial tools." 
+      />
       {/* Background */}
       <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-indigo-500/[0.05] via-background to-background pointer-events-none -z-10" />
       <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[140px] -z-10" />

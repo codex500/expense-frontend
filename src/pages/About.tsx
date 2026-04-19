@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Target, Users, Zap, Shield, TrendingUp, Globe } from 'lucide-react';
+import { SEO } from '@/components/ui/SEO';
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -10,6 +11,10 @@ const fadeUp = {
 export function About() {
   return (
     <div className="flex flex-col animate-fade-in">
+      <SEO 
+        title="About Us" 
+        description="Learn more about Trackify's mission to democratize financial literacy and provide the best expense tracking experience." 
+      />
       {/* Hero */}
       <div className="relative pt-28 sm:pt-36 pb-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/[0.06] via-background to-background -z-10" />

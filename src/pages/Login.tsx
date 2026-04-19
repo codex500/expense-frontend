@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { SEO } from '@/components/ui/SEO';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -31,6 +32,10 @@ export function Login() {
 
   return (
     <div className="min-h-screen w-full flex bg-background">
+      <SEO 
+        title="Login" 
+        description="Log into your Trackify account to view your expenses, manage your budgets, and monitor your personalized financial analytics." 
+      />
       {/* Left side - Branding */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-violet-500/5 to-blue-500/10 z-0" />
