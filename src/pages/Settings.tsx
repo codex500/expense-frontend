@@ -5,6 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useThemeStore } from '@/store/themeStore';
 import { authApi } from '@/api/endpoints';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
+import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
+import { GenderSelect } from '@/components/ui/GenderSelect';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
