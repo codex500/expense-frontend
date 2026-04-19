@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, ArrowRight, User, Eye, EyeOff, AlertCircle, CheckCircle2, Phone, CreditCard, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
+import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
+import { GenderSelect } from '@/components/ui/GenderSelect';
 import { SEO } from '@/components/ui/SEO';
 
 export function Signup() {
@@ -172,34 +174,13 @@ export function Signup() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date of Birth (DD-MM-YYYY)</label>
-                <div className="relative">
-                  <input 
-                    type="date" 
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    required
-                    max={new Date().toISOString().split('T')[0]} // Prevents future dates
-                    lang="en-GB"
-                    className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm transition-all text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary [color-scheme:dark]"
-                  />
-                </div>
+                <CustomDatePicker value={dob} onChange={setDob} />
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Gender</label>
                 <div className="relative">
-                  <select 
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    required
-                    className="appearance-none flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm transition-all text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                  >
-                    <option value="" disabled>Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <GenderSelect value={gender} onChange={setGender} />
                 </div>
               </div>
             </div>
