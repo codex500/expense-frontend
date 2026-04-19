@@ -69,15 +69,37 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/[0.06];
+    @apply bg-white/70 dark:bg-white/5 border border-white/20 dark:border-white/[0.06];
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
   .glass-card {
-    @apply bg-card/90 dark:bg-card/70 backdrop-blur-xl border border-border/50 dark:border-white/[0.06];
+    @apply bg-card/90 dark:bg-card/70 border border-border/50 dark:border-white/[0.06];
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
   }
   .dark .glass-card {
     box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+
+  /* Performance optimization for mobile devices (iOS webkit redraws lag with heavy blur) */
+  @media (max-width: 768px) {
+    .glass {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      @apply bg-white/85 dark:bg-zinc-900/85;
+    }
+    .glass-card {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      @apply bg-card/95 dark:bg-[#111318]/95;
+    }
+    .dark .glass-card {
+      box-shadow: none; /* Disable expensive shadow casting on mobile dark mode */
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
   }
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-violet-400;

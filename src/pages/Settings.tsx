@@ -314,6 +314,34 @@ export function Settings() {
                   </div>
                 </div>
               </div>
+
+              {/* Danger Zone */}
+              <div className="pt-6 border-t border-border mt-8">
+                <h3 className="text-lg font-semibold text-destructive mb-4">Danger Zone</h3>
+                <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-semibold text-sm text-destructive">Delete Account</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (window.confirm('Are you absolutely sure you want to delete your account? All your data will be permanently wiped. This action cannot be undone.')) {
+                        try {
+                          await authApi.deleteAccount();
+                          logout();
+                        } catch (err: any) {
+                          alert(err?.response?.data?.message || 'Failed to delete account.');
+                        }
+                      }
+                    }}
+                    className="shrink-0 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
         </div>

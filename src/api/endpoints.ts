@@ -18,6 +18,7 @@ export const authApi = {
     api.post('/auth/resend-otp', { email }),
   updateProfile: (body: { fullName?: string; dob?: string; mobileNumber?: string }) =>
     api.put('/auth/profile', body),
+  deleteAccount: () => api.delete('/auth/account'),
 };
 
 export const accountsApi = {
