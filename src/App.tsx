@@ -19,11 +19,28 @@ import { ContactUs } from '@/pages/ContactUs';
 import { useAuth } from '@/context/AuthContext';
 import { Settings } from '@/pages/Settings';
 import { Support } from '@/pages/Support';
-import { Toaster } from 'sonner';function ProtectedRoute({ children }: { children: React.ReactNode }) {
+import { Toaster } from 'sonner';
+import { Activity } from 'lucide-react';
+
+function GlobalLoader() {
+  return (
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-background">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute inset-0 bg-indigo-500/20 blur-[40px] rounded-full animate-pulse" />
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 shadow-xl shadow-indigo-500/20 isolate">
+          <Activity className="h-8 w-8 text-white animate-pulse" />
+          <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuth();
   
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading...</div>;
+    return <GlobalLoader />;
   }
   
   if (!token) {
@@ -37,7 +54,7 @@ function PublicRoute({ children }: { children?: React.ReactNode }) {
   const { token, loading } = useAuth();
   
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Loading...</div>;
+    return <GlobalLoader />;
   }
   
   if (token) {

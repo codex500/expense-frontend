@@ -5,6 +5,7 @@ import { useTransactions, useAccounts } from '@/hooks/useQueries';
 import { transactionsApi } from '@/api/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 function formatPaise(paise: number): string {
   return (paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -125,8 +126,19 @@ export function Transactions() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center p-12">
-            <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <div className="space-y-4 py-4 w-full animate-pulse">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex flex-col sm:flex-row items-center gap-4 py-3 sm:py-0 border-b border-border/10 last:border-0">
+                 <div className="h-10 w-10 rounded-xl bg-muted/40 shrink-0" />
+                 <div className="flex flex-col gap-2 flex-grow w-full">
+                    <div className="h-4 w-1/3 bg-muted/40 rounded" />
+                    <div className="h-3 w-1/4 bg-muted/40 rounded" />
+                 </div>
+                 <div className="hidden sm:block h-6 w-24 bg-muted/40 rounded-lg shrink-0" />
+                 <div className="h-5 w-20 bg-muted/40 rounded shrink-0 ml-auto" />
+                 <div className="h-8 w-8 bg-muted/40 rounded-lg shrink-0" />
+              </div>
+            ))}
           </div>
         ) : filteredTxns.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-muted-foreground">
