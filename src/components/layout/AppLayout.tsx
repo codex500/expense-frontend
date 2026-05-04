@@ -218,9 +218,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
           >
             {children}
           </motion.div>
@@ -274,6 +274,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
           queryClient.invalidateQueries({ queryKey: ['accounts'] });
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         }}
       />
     </div>

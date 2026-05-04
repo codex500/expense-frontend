@@ -59,6 +59,7 @@ export function Transactions() {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Transaction deleted successfully!');
     } catch (err: any) {
       toast.error('Failed to delete transaction: ' + (err?.response?.data?.message || 'Server error'));
@@ -286,6 +287,7 @@ function AddTransactionModal({ open, onClose, onSuccess }: { open: boolean; onCl
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['accountSummary'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       setAmount(''); setCategory(''); setNote(''); setAccountId('');
       onSuccess();
     } catch (err: any) {

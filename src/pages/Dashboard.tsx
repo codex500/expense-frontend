@@ -2,49 +2,68 @@ import { lazy, Suspense } from 'react';
 import { ArrowDownRight, ArrowUpRight, DollarSign, Wallet2, Sparkles, TrendingUp, TrendingDown } from 'lucide-react';
 import { useDashboardSummary } from '@/hooks/useQueries';
 import { useAuth } from '@/context/AuthContext';
-import { motion } from 'framer-motion';
 
 const DashboardChart = lazy(() => import('@/components/dashboard/DashboardChart'));
 
 function formatPaise(paise: number): string {
-  return (paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (Number(paise) / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function Dashboard() {
   const { user } = useAuth();
-  const { data: summary, isLoading } = useDashboardSummary();
+  const { data: summary, isLoading, error } = useDashboardSummary();
 
-  const income = summary?.totalIncome || 0;
-  const expense = summary?.totalExpense || 0;
-  const savings = income - expense > 0 ? income - expense : 0; 
-  const netWorth = summary?.balance || 0;
+  const income = Number(summary?.totalIncome) || 0;
+  const expense = Number(summary?.totalExpense) || 0;
+  const savings = income - expense > 0 ? income - expense : 0;
+  const netWorth = Number(summary?.balance) || 0;
 
   const transactions = summary?.recentTransactions || [];
 
   const rawWeekly = summary?.weeklyData || [];
-  const chartData = rawWeekly.map((d: any) => ({
-    name: d.week?.slice?.(5, 10) || 'Week',
-    spent: (d.expense || 0) / 100,
-  }));
+  const chartData = rawWeekly.map((d: any) => {
+    // Parse week timestamp into a readable label
+    const weekDate = new Date(d.week);
+    const label = !isNaN(weekDate.getTime())
+      ? `${weekDate.getDate()}/${weekDate.getMonth() + 1}`
+      : 'Week';
+    return {
+      name: label,
+      spent: (Number(d.expense) || 0) / 100,
+    };
+  });
 
   if (chartData.length === 0) {
-    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => chartData.push({ name: d, spent: 0 }));
+    DAY_NAMES.forEach(d => chartData.push({ name: d, spent: 0 }));
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse pb-20">
+      <div className="space-y-6 pb-20">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="h-8 w-64 bg-muted/40 rounded"></div>
+          <div className="h-8 w-64 bg-muted/40 rounded animate-pulse"></div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="glass-card rounded-2xl p-6 h-28 bg-muted/20" />
+            <div key={i} className="glass-card rounded-2xl p-6 h-28 bg-muted/20 animate-pulse" />
           ))}
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <div className="glass-card rounded-2xl col-span-4 p-6 h-[400px] bg-muted/20" />
-          <div className="glass-card rounded-2xl col-span-3 p-6 h-[400px] bg-muted/20" />
+          <div className="glass-card rounded-2xl col-span-4 p-6 h-[400px] bg-muted/20 animate-pulse" />
+          <div className="glass-card rounded-2xl col-span-3 p-6 h-[400px] bg-muted/20 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-3">
+          <p className="text-destructive font-medium">Failed to load dashboard data</p>
+          <p className="text-muted-foreground text-sm">Please check your connection and try refreshing.</p>
         </div>
       </div>
     );
@@ -58,7 +77,7 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20">
+    <div className="space-y-6 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-3xl font-extrabold tracking-tight">
@@ -69,11 +88,9 @@ export function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {cards.map((card, idx) => (
-          <motion.div 
+        {cards.map((card) => (
+          <div
             key={card.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
             className={`glass-card rounded-2xl p-6 bg-gradient-to-br ${card.gradient}`}
           >
             <div className="flex flex-row items-center justify-between pb-2">
@@ -83,11 +100,10 @@ export function Dashboard() {
             <div>
               <div className="text-2xl font-bold">₹{card.value}</div>
             </div>
-          </motion.div>
+          </div>
         ))}
 
-        <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
+        <div
           className="glass-card rounded-2xl p-6 relative overflow-hidden group bg-gradient-to-br from-primary/10 to-primary/5"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -98,20 +114,17 @@ export function Dashboard() {
           </div>
           <div className="mt-1">
             <p className="text-sm font-medium leading-snug">
-              {expense > 0 
+              {expense > 0
                 ? `Track your spending — you've spent ₹${formatPaise(expense)} this month. Great job keeping expenses in check!`
                 : 'Start adding transactions to get personalized AI insights about your spending.'
               }
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
-          className="glass-card rounded-2xl col-span-4 p-6"
-        >
+        <div className="glass-card rounded-2xl col-span-4 p-6">
           <div className="flex flex-col space-y-1.5 pb-6">
             <h3 className="font-semibold leading-none tracking-tight">Weekly Overview</h3>
             <p className="text-sm text-muted-foreground">Your spending over the last month.</p>
@@ -121,12 +134,9 @@ export function Dashboard() {
               <DashboardChart data={chartData} />
             </Suspense>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} 
-          className="glass-card rounded-2xl col-span-3 p-6 flex flex-col"
-        >
+        <div className="glass-card rounded-2xl col-span-3 p-6 flex flex-col">
           <div className="flex flex-col space-y-1.5 pb-6">
              <h3 className="font-semibold leading-none tracking-tight">Recent Transactions</h3>
              <p className="text-sm text-muted-foreground">
@@ -144,7 +154,7 @@ export function Dashboard() {
               transactions.map((txn: any) => (
                 <div key={txn.id} className="flex items-center group cursor-pointer hover:bg-muted/30 -mx-2 px-2 py-1.5 rounded-xl transition-colors">
                   <div className={`h-10 w-10 flex items-center justify-center rounded-xl transition-colors flex-shrink-0 ${
-                      txn.type === 'expense' ? 'bg-destructive/10 text-destructive' : 
+                      txn.type === 'expense' ? 'bg-destructive/10 text-destructive' :
                       txn.type === 'income' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'
                     }`}
                   >
@@ -157,16 +167,16 @@ export function Dashboard() {
                     <p className="text-xs text-muted-foreground">{txn.category} • {new Date(txn.transaction_date || txn.transactionDate).toLocaleDateString('en-IN')}</p>
                   </div>
                   <div className={`ml-auto font-bold text-sm whitespace-nowrap ${
-                    txn.type === 'expense' ? 'text-destructive' : 
+                    txn.type === 'expense' ? 'text-destructive' :
                     txn.type === 'income' ? 'text-success' : 'text-foreground'
                   }`}>
-                    {txn.type === 'expense' ? '-' : txn.type === 'income' ? '+' : ''}₹{formatPaise(txn.amount_paise || txn.amountPaise || 0)}
+                    {txn.type === 'expense' ? '-' : txn.type === 'income' ? '+' : ''}₹{formatPaise(Number(txn.amount_paise) || Number(txn.amountPaise) || 0)}
                   </div>
                 </div>
               ))
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
