@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Activity, CheckCircle2, AlertCircle, Loader2, RotateCw } from 'lucide-react';
 import { authApi } from '@/api/endpoints';
+import { toast } from 'sonner';
 
 export function VerifyEmail() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
@@ -24,10 +25,13 @@ export function VerifyEmail() {
     }
   }, [cooldown]);
 
-  // Auto-focus first input
+  // Auto-focus first input and show initial success message
   useEffect(() => {
     inputRefs.current[0]?.focus();
-  }, []);
+    if (email) {
+      toast.success('Verification code sent to your email');
+    }
+  }, [email]);
 
   const handleChange = (index: number, value: string) => {
     if (!/^[A-Za-z0-9]?$/.test(value)) return;
@@ -86,8 +90,11 @@ export function VerifyEmail() {
     setResending(true);
     try {
       await authApi.resendOtp(email);
+      toast.success('New verification code sent!');
       setCooldown(60);
-    } catch { }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to resend code');
+    }
     setResending(false);
   };
 

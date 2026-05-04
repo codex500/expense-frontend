@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { accountsApi, transactionsApi, budgetsApi, analyticsApi, advisorApi } from '@/api/endpoints';
+import { accountsApi, transactionsApi, budgetsApi, analyticsApi, advisorApi, dashboardApi } from '@/api/endpoints';
 
 export const useAccounts = () => {
   return useQuery({
@@ -50,6 +50,19 @@ export const useDashboardAnalytics = () => {
       const { data } = await analyticsApi.dashboard();
       return data.data; 
     },
+  });
+};
+
+export const useDashboardSummary = () => {
+  return useQuery({
+    queryKey: ['dashboard'],
+    queryFn: async () => {
+      const { data } = await dashboardApi.summary();
+      return data.data;
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    retry: 1
   });
 };
 

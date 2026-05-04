@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
-import { Dashboard } from '@/pages/Dashboard';
-import { Login } from '@/pages/Login';
-import { Signup } from '@/pages/Signup';
-import { ForgotPassword } from '@/pages/ForgotPassword';
-import { ResetPassword } from '@/pages/ResetPassword';
-import { VerifyEmail } from '@/pages/VerifyEmail';
-import { Transactions } from '@/pages/Transactions';
-import { Accounts } from '@/pages/Accounts';
-import { Budgets } from '@/pages/Budgets';
-import { Advisor } from '@/pages/Advisor';
-import { Analytics } from '@/pages/Analytics';
-import { Home } from '@/pages/Home';
-import { About } from '@/pages/About';
-import { ContactUs } from '@/pages/ContactUs';
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Transactions = lazy(() => import('@/pages/Transactions').then(module => ({ default: module.Transactions })));
+const Accounts = lazy(() => import('@/pages/Accounts').then(module => ({ default: module.Accounts })));
+const Budgets = lazy(() => import('@/pages/Budgets').then(module => ({ default: module.Budgets })));
+const Advisor = lazy(() => import('@/pages/Advisor').then(module => ({ default: module.Advisor })));
+const Analytics = lazy(() => import('@/pages/Analytics').then(module => ({ default: module.Analytics })));
+const Home = lazy(() => import('@/pages/Home').then(module => ({ default: module.Home })));
+const About = lazy(() => import('@/pages/About').then(module => ({ default: module.About })));
+const ContactUs = lazy(() => import('@/pages/ContactUs').then(module => ({ default: module.ContactUs })));
+const Login = lazy(() => import('@/pages/Login').then(module => ({ default: module.Login })));
+const Signup = lazy(() => import('@/pages/Signup').then(module => ({ default: module.Signup })));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword').then(module => ({ default: module.ResetPassword })));
+const VerifyEmail = lazy(() => import('@/pages/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
+const Settings = lazy(() => import('@/pages/Settings').then(module => ({ default: module.Settings })));
+const Support = lazy(() => import('@/pages/Support').then(module => ({ default: module.Support })));
 import { useAuth } from '@/context/AuthContext';
-import { Settings } from '@/pages/Settings';
-import { Support } from '@/pages/Support';
 import { Toaster } from 'sonner';
 import { Activity } from 'lucide-react';
 
@@ -66,36 +66,38 @@ function PublicRoute({ children }: { children?: React.ReactNode }) {
 
 function App() {
   return (
-    <Routes>
-      {/* Public Marketing Routes */}
-      <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<ContactUs />} />
-      </Route>
-      
-      {/* Auth Routes */}
-      <Route element={<PublicRoute />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-      </Route>
-      
-      {/* Protected Routes inside AppLayout */}
-      <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
-      <Route path="/transactions" element={<ProtectedRoute><AppLayout><Transactions /></AppLayout></ProtectedRoute>} />
-      <Route path="/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
-      <Route path="/budgets" element={<ProtectedRoute><AppLayout><Budgets /></AppLayout></ProtectedRoute>} />
-      <Route path="/analytics" element={<ProtectedRoute><AppLayout><Analytics /></AppLayout></ProtectedRoute>} />
-      <Route path="/advisor" element={<ProtectedRoute><AppLayout><Advisor /></AppLayout></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
-      <Route path="/support" element={<ProtectedRoute><AppLayout><Support /></AppLayout></ProtectedRoute>} />
-      
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <Suspense fallback={<GlobalLoader />}>
+      <Routes>
+        {/* Public Marketing Routes */}
+        <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<ContactUs />} />
+        </Route>
+        
+        {/* Auth Routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+        </Route>
+        
+        {/* Protected Routes inside AppLayout */}
+        <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+        <Route path="/transactions" element={<ProtectedRoute><AppLayout><Transactions /></AppLayout></ProtectedRoute>} />
+        <Route path="/accounts" element={<ProtectedRoute><AppLayout><Accounts /></AppLayout></ProtectedRoute>} />
+        <Route path="/budgets" element={<ProtectedRoute><AppLayout><Budgets /></AppLayout></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><AppLayout><Analytics /></AppLayout></ProtectedRoute>} />
+        <Route path="/advisor" element={<ProtectedRoute><AppLayout><Advisor /></AppLayout></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+        <Route path="/support" element={<ProtectedRoute><AppLayout><Support /></AppLayout></ProtectedRoute>} />
+        
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 

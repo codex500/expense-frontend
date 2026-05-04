@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         defaultCurrency: sessionData.defaultCurrency,
         onboardingCompleted: sessionData.onboardingCompleted,
         accountCount: sessionData.accountCount,
+        phone: sessionData.phone,
+        pan: sessionData.pan,
       });
       setToken(t);
     } catch {

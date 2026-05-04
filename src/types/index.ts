@@ -4,7 +4,8 @@ export interface User {
   fullName: string;
   dob?: string;
   gender?: string;
-  mobileNumber?: string;
+  phone?: string;
+  pan?: string;
   emailVerified?: boolean;
   defaultCurrency?: string;
   themePreference?: string;

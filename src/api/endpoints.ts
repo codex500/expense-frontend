@@ -59,6 +59,10 @@ export const advisorApi = {
   insights: () => api.get('/advisor/insights'),
 };
 
+export const dashboardApi = {
+  summary: () => api.get('/dashboard/summary'),
+};
+
 export const salaryApi = {
   check: () => api.get('/salary/check'),
   deposit: (body: any) => api.post('/salary/deposit', body),

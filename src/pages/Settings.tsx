@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Palette, Bell, LogOut, Moon, Sun, Monitor, Check, ChevronRight, Save, Phone, Calendar, Shield, Lock, ChevronDown } from 'lucide-react';
+import { User, Mail, Palette, Bell, LogOut, Moon, Sun, Monitor, Check, ChevronRight, Save, Phone, Calendar, Shield, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useThemeStore } from '@/store/themeStore';
@@ -36,14 +36,16 @@ export function Settings() {
         setFullName(p.fullName || '');
         setDob(p.dob ? p.dob.split('T')[0] : '');
         setGender(p.gender || '');
-        setPanCard(p.panCard || 'Not provided');
-        const rawMobile = p.mobileNumber || '';
+        setPanCard(p.pan ?? 'Not Provided');
+        const rawMobile = p.phone || 'Not Available';
         const match = rawMobile.match(/^(\+\d{1,4})\s+(.+)$/);
         if (match) {
           setCountryCode(match[1]);
           setMobileNumber(match[2]);
-        } else {
+        } else if (rawMobile !== 'Not Available') {
           setMobileNumber(rawMobile);
+        } else {
+          setMobileNumber('');
         }
       } catch {}
     };

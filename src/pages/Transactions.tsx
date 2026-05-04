@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Filter, Plus, ArrowUpRight, ArrowDownRight, Calendar, CreditCard, Wallet2, X, Download, Trash2, Lock, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts } from '@/hooks/useQueries';
+import { useDebounce } from '@/hooks/useDebounce';
 import { transactionsApi } from '@/api/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -22,10 +23,11 @@ export function Transactions() {
   const queryClient = useQueryClient();
   
   const transactions = data?.transactions || [];
-  const filteredTxns = searchTerm 
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const filteredTxns = debouncedSearchTerm 
     ? transactions.filter((t: any) => 
-        t.category?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        t.note?.toLowerCase().includes(searchTerm.toLowerCase())
+        t.category?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || 
+        t.note?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       )
     : transactions;
 
