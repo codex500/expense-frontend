@@ -1,14 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard
-Disallow: /transactions
-Disallow: /accounts
-Disallow: /budgets
-Disallow: /analytics
-Disallow: /advisor
-Disallow: /settings
-Disallow: /support
-Disallow: /verify-email
-Disallow: /reset-password
 
-Sitemap: https://www.trackifyapp.space/sitemap.xml
+Sitemap: https://trackifyapp.space/sitemap.xml

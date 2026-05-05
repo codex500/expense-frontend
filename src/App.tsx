@@ -20,7 +20,9 @@ const Settings = lazy(() => import('@/pages/Settings').then(module => ({ default
 const Support = lazy(() => import('@/pages/Support').then(module => ({ default: module.Support })));
 import { useAuth } from '@/context/AuthContext';
 import { Toaster } from 'sonner';
-import { Activity } from 'lucide-react';
+import { Activity, AlertTriangle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 
 function GlobalLoader() {
   return (
@@ -64,9 +66,31 @@ function PublicRoute({ children }: { children?: React.ReactNode }) {
   return children ? <>{children}</> : <Outlet />;
 }
 
+function NotFound() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
+      <div className="h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center mb-6">
+        <AlertTriangle className="h-8 w-8 text-destructive" />
+      </div>
+      <h1 className="text-4xl font-extrabold tracking-tight mb-2">404 - Page Not Found</h1>
+      <p className="text-muted-foreground mb-8 max-w-md">
+        Oops! The page you are looking for doesn't exist or has been moved.
+      </p>
+      <Link to="/" className="inline-flex items-center justify-center h-12 px-6 btn-primary-glow rounded-xl font-medium text-sm transition-all hover:scale-[1.02]">
+        Return Home
+      </Link>
+    </div>
+  );
+}
+
 function App() {
   return (
     <Suspense fallback={<GlobalLoader />}>
+      <Helmet>
+        <title>Trackify - Smart Expense Tracker</title>
+        <meta name="description" content="Track your expenses, manage budget, and analyze spending with Trackify." />
+        <link rel="canonical" href="https://trackifyapp.space" />
+      </Helmet>
       <Routes>
         {/* Public Marketing Routes */}
         <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
@@ -95,7 +119,7 @@ function App() {
         <Route path="/support" element={<ProtectedRoute><AppLayout><Support /></AppLayout></ProtectedRoute>} />
         
         {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );
