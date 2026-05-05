@@ -8,7 +8,7 @@ export const authApi = {
     api.post('/auth/login', { email, password }),
   register: (fullName: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string, panCard?: string) =>
     api.post('/auth/signup', { fullName, email, password, dob, gender, mobileNumber, panCard }),
-  me: () => api.get('/auth/session'),
+  me: () => api.get('/auth/me'),
   forgotPassword: (email: string) =>
     api.post('/auth/forgot-password', { email }),
   logout: () => api.post('/auth/logout'),
@@ -17,15 +17,20 @@ export const authApi = {
   resendOtp: (email: string) =>
     api.post('/auth/resend-otp', { email }),
   updateProfile: (body: { fullName?: string; dob?: string; mobileNumber?: string; gender?: string }) =>
-    api.put('/auth/profile', body),
-  deleteAccount: () => api.delete('/auth/account'),
+    api.patch('/users/update', body),
+  deleteAccount: () => api.delete('/users/delete'),
+};
+
+export const settingsApi = {
+  get: () => api.get('/settings'),
+  update: (body: any) => api.patch('/settings', body),
 };
 
 export const accountsApi = {
   getAll: () => api.get('/accounts'),
   getSummary: () => api.get('/accounts/summary'),
   create: (body: any) => api.post('/accounts', body),
-  update: (id: string, body: any) => api.put(`/accounts/${id}`, body),
+  update: (id: string, body: any) => api.patch(`/accounts/${id}`, body),
   delete: (id: string) => api.delete(`/accounts/${id}`),
   transfer: (body: any) => api.post('/accounts/transfer', body),
 };
@@ -34,9 +39,13 @@ export const transactionsApi = {
   list: (params?: Record<string, any>) =>
     api.get('/transactions', { params }),
   create: (body: any) => api.post('/transactions', body),
-  update: (id: string, body: any) => api.put(`/transactions/${id}`, body),
+  update: (id: string, body: any) => api.patch(`/transactions/${id}`, body),
   delete: (id: string) => api.delete(`/transactions/${id}`),
-  exportPdf: () => api.get('/transactions/export/pdf', { responseType: 'blob' }),
+};
+
+export const reportsApi = {
+  exportPdf: (params?: Record<string, any>) => api.get('/reports/pdf', { params, responseType: 'blob' }),
+  exportCsv: (params?: Record<string, any>) => api.get('/reports/csv', { params, responseType: 'blob' }),
 };
 
 export const budgetsApi = {
@@ -47,12 +56,12 @@ export const budgetsApi = {
 };
 
 export const analyticsApi = {
-  dashboard: () => api.get('/analytics/dashboard'),
-  expenseByCategory: (params?: Record<string, any>) => api.get('/analytics/expense-by-category', { params }),
-  expenseByAccount: () => api.get('/analytics/expense-by-account'),
+  dashboard: () => api.get('/analytics/summary'),
+  expenseByCategory: (params?: Record<string, any>) => api.get('/analytics/category', { params }),
+  expenseByAccount: () => api.get('/analytics/expense-by-account'), // Alias kept on backend
   monthly: (months = 6) => api.get('/analytics/monthly', { params: { months } }),
-  weekly: () => api.get('/analytics/weekly'),
-  spendingTrend: () => api.get('/analytics/spending-trend'),
+  weekly: () => api.get('/analytics/weekly'), // Alias kept
+  spendingTrend: () => api.get('/analytics/trend'),
 };
 
 export const advisorApi = {

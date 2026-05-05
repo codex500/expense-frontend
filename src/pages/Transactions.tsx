@@ -3,7 +3,7 @@ import { Search, Filter, Plus, ArrowUpRight, ArrowDownRight, Calendar, CreditCar
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts } from '@/hooks/useQueries';
 import { useDebounce } from '@/hooks/useDebounce';
-import { transactionsApi } from '@/api/endpoints';
+import { transactionsApi, reportsApi } from '@/api/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -34,7 +34,7 @@ export function Transactions() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await transactionsApi.exportPdf();
+      const response = await reportsApi.exportPdf();
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
