@@ -1,7 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { ArrowDownRight, ArrowUpRight, DollarSign, Wallet2, Sparkles, TrendingUp, TrendingDown } from 'lucide-react';
 import { useDashboardSummary } from '@/hooks/useQueries';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 const DashboardChart = lazy(() => import('@/components/dashboard/DashboardChart'));
 
@@ -14,6 +15,12 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export function Dashboard() {
   const { user } = useAuth();
   const { data: summary, isLoading, error } = useDashboardSummary();
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Failed to load dashboard data');
+    }
+  }, [error]);
 
   const income = Number(summary?.totalIncome) || 0;
   const expense = Number(summary?.totalExpense) || 0;
@@ -45,14 +52,14 @@ export function Dashboard() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="h-8 w-64 bg-muted/40 rounded animate-pulse"></div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="glass-card rounded-2xl p-6 h-28 bg-muted/20 animate-pulse" />
+            <div key={i} className="glass-card rounded-2xl p-4 md:p-6 h-24 md:h-28 bg-muted/20 animate-pulse" />
           ))}
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <div className="glass-card rounded-2xl col-span-4 p-6 h-[400px] bg-muted/20 animate-pulse" />
-          <div className="glass-card rounded-2xl col-span-3 p-6 h-[400px] bg-muted/20 animate-pulse" />
+          <div className="glass-card rounded-2xl col-span-4 p-6 h-[250px] md:h-[400px] bg-muted/20 animate-pulse" />
+          <div className="glass-card rounded-2xl col-span-3 p-6 h-[300px] md:h-[400px] bg-muted/20 animate-pulse" />
         </div>
       </div>
     );
@@ -87,24 +94,24 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-5">
         {cards.map((card) => (
           <div
             key={card.label}
-            className={`glass-card rounded-2xl p-6 bg-gradient-to-br ${card.gradient}`}
+            className={`glass-card rounded-2xl p-4 md:p-6 bg-gradient-to-br ${card.gradient}`}
           >
-            <div className="flex flex-row items-center justify-between pb-2">
-              <h3 className="tracking-tight text-sm font-medium text-muted-foreground">{card.label}</h3>
-              <card.icon className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-row items-center justify-between pb-1 md:pb-2">
+              <h3 className="tracking-tight text-xs md:text-sm font-medium text-muted-foreground">{card.label}</h3>
+              <card.icon className="h-4 w-4 text-muted-foreground hidden sm:block" />
             </div>
             <div>
-              <div className="text-2xl font-bold">₹{card.value}</div>
+              <div className="text-xl md:text-2xl font-bold truncate">₹{card.value}</div>
             </div>
           </div>
         ))}
 
         <div
-          className="glass-card rounded-2xl p-6 relative overflow-hidden group bg-gradient-to-br from-primary/10 to-primary/5"
+          className="glass-card rounded-2xl p-4 md:p-6 relative overflow-hidden group bg-gradient-to-br from-primary/10 to-primary/5 col-span-2 md:col-span-1"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex flex-row items-center justify-between pb-2">
@@ -124,20 +131,20 @@ export function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="glass-card rounded-2xl col-span-4 p-6">
-          <div className="flex flex-col space-y-1.5 pb-6">
+        <div className="glass-card rounded-2xl col-span-4 p-4 md:p-6">
+          <div className="flex flex-col space-y-1.5 pb-4 md:pb-6">
             <h3 className="font-semibold leading-none tracking-tight">Weekly Overview</h3>
             <p className="text-sm text-muted-foreground">Your spending over the last month.</p>
           </div>
-          <div className="pl-2 h-[300px]">
+          <div className="pl-0 md:pl-2 h-[220px] md:h-[300px]">
             <Suspense fallback={<div className="w-full h-full flex items-center justify-center bg-muted/10 rounded animate-pulse" />}>
               <DashboardChart data={chartData} />
             </Suspense>
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl col-span-3 p-6 flex flex-col">
-          <div className="flex flex-col space-y-1.5 pb-6">
+        <div className="glass-card rounded-2xl col-span-3 p-4 md:p-6 flex flex-col h-[400px] md:h-auto">
+          <div className="flex flex-col space-y-1.5 pb-4 md:pb-6">
              <h3 className="font-semibold leading-none tracking-tight">Recent Transactions</h3>
              <p className="text-sm text-muted-foreground">
                {transactions.length > 0 ? `Showing your latest ${transactions.length} transactions.` : 'No transactions yet.'}

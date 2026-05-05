@@ -60,8 +60,8 @@ export const useDashboardSummary = () => {
       const { data } = await dashboardApi.summary();
       return data.data;
     },
-    staleTime: 1000 * 60, // 1 minute (was 5min — too stale)
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
     retry: 2,
   });
 };
