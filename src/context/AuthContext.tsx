@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string, panCard?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  setSession: (token: string, user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -81,6 +82,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(accessToken);
   };
 
+  const setSession = (accessToken: string, userData: User) => {
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    setToken(accessToken);
+  };
+
   const register = async (name: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string, panCard?: string) => {
     // Registration returns success message, user needs to verify email before login
     await authApi.register(name, email, password, dob, gender, mobileNumber, panCard);
@@ -94,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser, setSession }}>
       {children}
     </AuthContext.Provider>
   );

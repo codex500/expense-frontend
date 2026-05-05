@@ -19,6 +19,12 @@ export const authApi = {
   updateProfile: (body: { fullName?: string; dob?: string; mobileNumber?: string; gender?: string }) =>
     api.patch('/users/update', body),
   deleteAccount: () => api.delete('/users/delete'),
+  registerPasskey: () => api.post('/auth/passkey/register'),
+  verifyPasskeyRegistration: (body: any) => api.post('/auth/passkey/verify-registration', body),
+  generatePasskeyAuth: (email: string) => api.post('/auth/passkey/generate-auth', { email }),
+  verifyPasskeyAuth: (body: any) => api.post('/auth/passkey/verify-auth', body),
+  removePasskey: () => api.delete('/auth/passkey/remove'),
+  getOAuthUrl: (provider: 'google' | 'apple') => api.get(`/auth/oauth/${provider}`),
 };
 
 export const settingsApi = {

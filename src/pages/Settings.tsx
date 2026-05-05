@@ -9,6 +9,7 @@ import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
 import { GenderSelect } from '@/components/ui/GenderSelect';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { startRegistration } from '@simplewebauthn/browser';
 
 export function Settings() {
   const { user, logout, refreshUser } = useAuth();
@@ -66,6 +67,25 @@ export function Settings() {
       setProfileError(err?.response?.data?.message || 'Failed to update profile.');
     } finally {
       setProfileLoading(false);
+    }
+  };
+
+  const [isPasskeyRegistering, setIsPasskeyRegistering] = useState(false);
+  const handleRegisterPasskey = async () => {
+    setIsPasskeyRegistering(true);
+    try {
+      const { data: generateData } = await authApi.registerPasskey();
+      const options = generateData.options;
+
+      const attResp = await startRegistration({ optionsJSON: options });
+
+      await authApi.verifyPasskeyRegistration({ response: attResp });
+      toast.success('Passkey added successfully!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || err?.message || 'Failed to add passkey.');
+    } finally {
+      setIsPasskeyRegistering(false);
     }
   };
 
@@ -337,6 +357,26 @@ export function Settings() {
                       <p className="font-medium text-sm">Password</p>
                       <p className="text-xs text-muted-foreground">Use 'Forgot Password' on the login page to change your password</p>
                     </div>
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl border border-border/50">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                        <Lock className="h-5 w-5 text-indigo-500" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Passkeys (WebAuthn)</p>
+                        <p className="text-xs text-muted-foreground">Sign in securely with your device's biometric authentication.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleRegisterPasskey}
+                      disabled={isPasskeyRegistering}
+                      className="shrink-0 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
+                    >
+                      {isPasskeyRegistering ? 'Registering...' : 'Add Passkey'}
+                    </button>
                   </div>
                 </div>
               </div>
