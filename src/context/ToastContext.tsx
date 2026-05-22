@@ -1,26 +1,17 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Toast } from '@/components/common/Toast';
-import type { ToastType } from '@/types/toast';
+/**
+ * ToastContext — shim that wraps sonner's toast functions.
+ * The useToast hook and Profile page import `useToastContext` from here.
+ * This provides a `show(message, type)` API compatible with existing usage.
+ */
 
-const ToastContext = createContext<{ show: (message: string, type?: ToastType) => void } | null>(null);
-
-export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
-  const show = useCallback((message: string, type: ToastType = 'info') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
-
-  return (
-    <ToastContext.Provider value={{ show }}>
-      {children}
-      {toast && <Toast message={toast.message} type={toast.type} />}
-    </ToastContext.Provider>
-  );
-}
+import { toast } from 'sonner';
 
 export function useToastContext() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToastContext must be used within ToastProvider');
-  return ctx;
+  return {
+    show: (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+      if (type === 'success') toast.success(message);
+      else if (type === 'error') toast.error(message);
+      else toast.info(message);
+    },
+  };
 }

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { ArrowDownRight, ArrowUpRight, DollarSign, Wallet2, Sparkles, TrendingUp, TrendingDown } from 'lucide-react';
 import { useDashboardSummary } from '@/hooks/useQueries';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 const DashboardChart = lazy(() => import('@/components/dashboard/DashboardChart'));
@@ -13,7 +13,7 @@ function formatPaise(paise: number): string {
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const user = useAuthStore((state) => state.user);
   const { data: summary, isLoading, error } = useDashboardSummary();
 
   useEffect(() => {

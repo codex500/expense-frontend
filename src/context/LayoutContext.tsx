@@ -1,10 +1,26 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+/**
+ * LayoutContext — provides sidebar toggle state for legacy Navbar/Sidebar components.
+ * The main AppLayout.tsx manages its own sidebar state, but these legacy components
+ * reference this context. This shim ensures they compile without errors.
+ */
 
-const LayoutContext = createContext<{ sidebarOpen: boolean; setSidebarOpen: (v: boolean) => void; toggleSidebar: () => void } | null>(null);
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-export function LayoutProvider({ children }: { children: React.ReactNode }) {
+interface LayoutContextValue {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
+}
+
+const LayoutContext = createContext<LayoutContextValue>({
+  sidebarOpen: false,
+  setSidebarOpen: () => {},
+  toggleSidebar: () => {},
+});
+
+export function LayoutProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((o) => !o), []);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   return (
     <LayoutContext.Provider value={{ sidebarOpen, setSidebarOpen, toggleSidebar }}>
       {children}
@@ -13,7 +29,5 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useLayout() {
-  const ctx = useContext(LayoutContext);
-  if (!ctx) throw new Error('useLayout must be used within LayoutProvider');
-  return ctx;
+  return useContext(LayoutContext);
 }

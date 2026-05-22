@@ -1,28 +1,32 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
-const Transactions = lazy(() => import('@/pages/Transactions').then(module => ({ default: module.Transactions })));
-const Accounts = lazy(() => import('@/pages/Accounts').then(module => ({ default: module.Accounts })));
-const Budgets = lazy(() => import('@/pages/Budgets').then(module => ({ default: module.Budgets })));
-const Advisor = lazy(() => import('@/pages/Advisor').then(module => ({ default: module.Advisor })));
-const Analytics = lazy(() => import('@/pages/Analytics').then(module => ({ default: module.Analytics })));
-const Home = lazy(() => import('@/pages/Home').then(module => ({ default: module.Home })));
-const About = lazy(() => import('@/pages/About').then(module => ({ default: module.About })));
-const ContactUs = lazy(() => import('@/pages/ContactUs').then(module => ({ default: module.ContactUs })));
-const Login = lazy(() => import('@/pages/Login').then(module => ({ default: module.Login })));
-const Signup = lazy(() => import('@/pages/Signup').then(module => ({ default: module.Signup })));
-const ForgotPassword = lazy(() => import('@/pages/ForgotPassword').then(module => ({ default: module.ForgotPassword })));
-const ResetPassword = lazy(() => import('@/pages/ResetPassword').then(module => ({ default: module.ResetPassword })));
-const VerifyEmail = lazy(() => import('@/pages/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
-const Settings = lazy(() => import('@/pages/Settings').then(module => ({ default: module.Settings })));
-const Support = lazy(() => import('@/pages/Support').then(module => ({ default: module.Support })));
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
+import { useThemeStore } from '@/store/themeStore';
+import { authService } from '@/services/endpoints';
 import { Toaster } from 'sonner';
 import { Activity, AlertTriangle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+
+// Lazy load pages for code splitting
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Transactions = lazy(() => import('@/pages/Transactions').then(m => ({ default: m.Transactions })));
+const Accounts = lazy(() => import('@/pages/Accounts').then(m => ({ default: m.Accounts })));
+const Budgets = lazy(() => import('@/pages/Budgets').then(m => ({ default: m.Budgets })));
+const Advisor = lazy(() => import('@/pages/Advisor').then(m => ({ default: m.Advisor })));
+const Analytics = lazy(() => import('@/pages/Analytics').then(m => ({ default: m.Analytics })));
+const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
+const About = lazy(() => import('@/pages/About').then(m => ({ default: m.About })));
+const ContactUs = lazy(() => import('@/pages/ContactUs').then(m => ({ default: m.ContactUs })));
+const Login = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })));
+const Signup = lazy(() => import('@/pages/Signup').then(m => ({ default: m.Signup })));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword').then(m => ({ default: m.ResetPassword })));
+const VerifyEmail = lazy(() => import('@/pages/VerifyEmail').then(m => ({ default: m.VerifyEmail })));
+const Settings = lazy(() => import('@/pages/Settings').then(m => ({ default: m.Settings })));
+const Support = lazy(() => import('@/pages/Support').then(m => ({ default: m.Support })));
 
 function GlobalLoader() {
   return (
@@ -39,13 +43,9 @@ function GlobalLoader() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token, loading } = useAuth();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   
-  if (loading) {
-    return <GlobalLoader />;
-  }
-  
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
@@ -53,13 +53,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function PublicRoute({ children }: { children?: React.ReactNode }) {
-  const { token, loading } = useAuth();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   
-  if (loading) {
-    return <GlobalLoader />;
-  }
-  
-  if (token) {
+  if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
   
@@ -84,6 +80,46 @@ function NotFound() {
 }
 
 function App() {
+  const [isInitializing, setIsInitializing] = useState(true);
+  const { setAuth, logout } = useAuthStore();
+  const theme = useThemeStore((state) => state.theme);
+
+  useEffect(() => {
+    // Initial auth check
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const { data } = await authService.me();
+          setAuth(data.data, token);
+        } catch {
+          logout();
+        }
+      } else {
+        logout();
+      }
+      setIsInitializing(false);
+    };
+    initAuth();
+  }, [setAuth, logout]);
+
+  useEffect(() => {
+    // Intercept Supabase default recovery links
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      if (params.get('type') === 'recovery' && params.get('access_token')) {
+        window.location.href = `/reset-password#${hash}`;
+      } else if (params.get('type') === 'signup' && params.get('access_token')) {
+        window.location.href = `/verify-email#${hash}`;
+      }
+    }
+  }, []);
+
+  if (isInitializing) {
+    return <GlobalLoader />;
+  }
+
   return (
     <Suspense fallback={<GlobalLoader />}>
       <Helmet>
@@ -91,6 +127,7 @@ function App() {
         <meta name="description" content="Track your expenses, manage budget, and analyze spending with Trackify." />
         <link rel="canonical" href="https://trackifyapp.space" />
       </Helmet>
+      <Toaster position="top-right" richColors theme={theme} />
       <Routes>
         {/* Public Marketing Routes */}
         <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
@@ -125,27 +162,4 @@ function App() {
   );
 }
 
-// Wrapper to catch Supabase hash links at root
-function AppWrapper() {
-  useState(() => {
-    // Intercept Supabase default recovery links
-    if (typeof window !== 'undefined' && window.location.hash) {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      if (params.get('type') === 'recovery' && params.get('access_token')) {
-        window.location.href = `/reset-password#${hash}`;
-      } else if (params.get('type') === 'signup' && params.get('access_token')) {
-        window.location.href = `/verify-email#${hash}`;
-      }
-    }
-  });
-  
-  return (
-    <>
-      <Toaster position="top-right" richColors theme="system" />
-      <App />
-    </>
-  );
-}
-
-export default AppWrapper;
+export default App;

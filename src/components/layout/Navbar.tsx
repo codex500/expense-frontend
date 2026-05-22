@@ -1,8 +1,9 @@
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { useLayout } from '@/context/LayoutContext';
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const { toggleSidebar } = useLayout();
 
   return (

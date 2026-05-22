@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Send, CheckCircle2, AlertCircle } from 'lucide-react';
-import { contactApi } from '@/api/endpoints';
-import { useAuth } from '@/context/AuthContext';
+import { contactApi } from '@/services/endpoints';
+import { useAuthStore } from '@/store/authStore';
 
 export function Support() {
-  const { user } = useAuth();
+  const user = useAuthStore(state => state.user);
   const [formData, setFormData] = useState({ name: '', email: '', subject: 'Dashboard Support Question', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 

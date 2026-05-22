@@ -38,12 +38,12 @@ export function TransactionTable({ transactions, onDelete, loading }: Transactio
         <tbody>
           {transactions.map((t) => (
             <tr key={t.id} className="border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
-              <td className="px-2 sm:px-4 py-2 sm:py-3 text-slate-600 dark:text-slate-300 whitespace-nowrap">{new Date(t.transaction_date).toLocaleDateString()}</td>
+              <td className="px-2 sm:px-4 py-2 sm:py-3 text-slate-600 dark:text-slate-300 whitespace-nowrap">{new Date(t.transactionDate).toLocaleDateString()}</td>
               <td className="px-2 sm:px-4 py-2 sm:py-3">
                 <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${t.type === 'income' ? 'bg-secondary/20 text-secondary' : 'bg-accent/20 text-accent'}`}>{t.type}</span>
               </td>
               <td className="px-2 sm:px-4 py-2 sm:py-3 text-slate-700 dark:text-slate-200">{t.category}</td>
-              <td className={`px-2 sm:px-4 py-2 sm:py-3 text-right font-medium whitespace-nowrap ${t.type === 'income' ? 'text-secondary' : 'text-accent'}`}>{t.type === 'income' ? '+' : '-'} ₹{Number(t.amount).toLocaleString()}</td>
+              <td className={`px-2 sm:px-4 py-2 sm:py-3 text-right font-medium whitespace-nowrap ${t.type === 'income' ? 'text-secondary' : 'text-accent'}`}>{t.type === 'income' ? '+' : '-'} ₹{Number(t.amountPaise).toLocaleString()}</td>
               {onDelete && (
                 <td className="px-2 sm:px-4 py-2 sm:py-3">
                   <button type="button" onClick={() => onDelete(t.id)} className="rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-500 hover:bg-red-500/10" aria-label="Delete">

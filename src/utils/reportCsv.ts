@@ -3,11 +3,11 @@ import type { Transaction } from '@/types';
 export function downloadCsv(transactions: Transaction[]) {
   const headers = ['Date', 'Type', 'Category', 'Payment', 'Amount', 'Note'];
   const rows = transactions.map((t) => [
-    t.transaction_date,
+    t.transactionDate,
     t.type,
     t.category,
-    t.payment_method || '',
-    t.amount,
+    t.accountId || '',
+    t.amountPaise,
     t.note || '',
   ]);
   const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');

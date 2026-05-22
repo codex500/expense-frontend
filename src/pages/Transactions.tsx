@@ -3,7 +3,7 @@ import { Search, Filter, Plus, ArrowUpRight, ArrowDownRight, Calendar, CreditCar
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts } from '@/hooks/useQueries';
 import { useDebounce } from '@/hooks/useDebounce';
-import { transactionsApi, reportsApi } from '@/api/endpoints';
+import { transactionsService, analyticsService } from '@/services/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -34,7 +34,7 @@ export function Transactions() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await reportsApi.exportPdf();
+      const response = await analyticsService.dashboard();
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
@@ -55,7 +55,7 @@ export function Transactions() {
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
-      await transactionsApi.delete(id);
+      await transactionsService.delete(id);
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['analytics'] });
@@ -275,7 +275,7 @@ function AddTransactionModal({ open, onClose, onSuccess }: { open: boolean; onCl
     }
     setLoading(true);
     try {
-      await transactionsApi.create({
+      await transactionsService.create({
         type,
         amountPaise: Math.round(Number(amount) * 100),
         category,

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Activity, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { Activity, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle, Fingerprint } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 import { SEO } from '@/components/ui/SEO';
-import { authApi } from '@/api/endpoints';
-import { startAuthentication } from '@simplewebauthn/browser';
+import { authService } from '@/services/endpoints';
 import { toast } from 'sonner';
+import { startAuthentication } from '@simplewebauthn/browser';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -14,9 +14,8 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, setSession } = useAuth();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +23,9 @@ export function Login() {
     setIsLoading(true);
     
     try {
-      await login(email, password);
+      const { data } = await authService.login(email, password);
+      const result = data.data;
+      setAuth(result.user, result.session.accessToken);
       navigate('/dashboard');
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || 'Login failed. Please check your credentials.';
@@ -36,30 +37,32 @@ export function Login() {
 
   const handlePasskeyLogin = async () => {
     if (!email) {
-      setError('Please enter your email to sign in with a passkey.');
+      setError('Please enter your email first to use passkey.');
       return;
     }
     setError('');
-    setIsPasskeyLoading(true);
+    setIsLoading(true);
     try {
-      const generateRes = await authApi.generatePasskeyAuth(email);
-      const options = generateRes.data.options;
-
-      const authResp = await startAuthentication({ optionsJSON: options });
-
-      const verifyRes = await authApi.verifyPasskeyAuth({ email, response: authResp });
+      const { data: optionsData } = await authService.generatePasskeyAuth(email);
+      const asseResp = await startAuthentication({ optionsJSON: optionsData.data });
       
-      const { user, session } = verifyRes.data.data;
-      setSession(session.accessToken, user);
-      toast.success('Signed in successfully with Passkey!');
+      const { data: verifyData } = await authService.verifyPasskeyAuth(email, asseResp);
+      
+      // verifyData returns { data: { verified: true, user: {...}, token: '...' } }
+      const user = verifyData.data.user;
+      const token = verifyData.data.token;
+      
+      localStorage.setItem('auth_token', token);
+      setAuth(user, token);
       navigate('/dashboard');
     } catch (err: any) {
-      console.error(err);
-      setError(err?.response?.data?.message || err?.message || 'Passkey authentication failed.');
+      const message = err?.response?.data?.message || err?.message || 'Passkey login failed.';
+      setError(message);
     } finally {
-      setIsPasskeyLoading(false);
+      setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen w-full flex bg-background">
@@ -208,20 +211,7 @@ export function Login() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
-            <button
-              type="button"
-              onClick={handlePasskeyLogin}
-              disabled={isLoading || isPasskeyLoading}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-border/50 bg-background hover:bg-muted/30 transition-all font-medium text-sm disabled:opacity-50"
-            >
-              {isPasskeyLoading ? (
-                <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mr-2" />
-              ) : (
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-              )}
-              Passkey
-            </button>
+          <div className="grid grid-cols-1 gap-3 mt-6">
             <a
               href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/oauth/google`}
               className="inline-flex h-11 items-center justify-center rounded-xl border border-border/50 bg-background hover:bg-muted/30 transition-all font-medium text-sm disabled:opacity-50"
@@ -234,6 +224,16 @@ export function Login() {
               </svg>
               Google
             </a>
+            
+            <button
+              type="button"
+              onClick={handlePasskeyLogin}
+              disabled={isLoading}
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-border/50 bg-background hover:bg-muted/30 transition-all font-medium text-sm disabled:opacity-50"
+            >
+              <Fingerprint className="w-5 h-5 mr-2" />
+              Sign in with Passkey
+            </button>
           </div>
         </motion.div>
       </div>

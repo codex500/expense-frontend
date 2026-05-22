@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet2, Landmark, CreditCard, Smartphone, Plus, X, TrendingUp, Edit3, Trash2 } from 'lucide-react';
 import { useAccounts } from '@/hooks/useQueries';
-import { accountsApi } from '@/api/endpoints';
+import { accountsService } from '@/services/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -39,7 +39,7 @@ export function Accounts() {
 
   const handleDeleteAccount = async (id: string) => {
     try {
-      await accountsApi.delete(id);
+      await accountsService.delete(id);
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['accountSummary'] });
       toast.success('Account deleted successfully!');
@@ -172,7 +172,7 @@ function AddAccountModal({ open, onClose, onSuccess }: { open: boolean; onClose:
     if (!accountName) { setError('Account name is required.'); return; }
     setLoading(true);
     try {
-      await accountsApi.create({
+      await accountsService.create({
         accountName,
         bankName: bankName || undefined,
         type,
@@ -263,7 +263,7 @@ function EditAccountModal({ account, onClose, onSuccess }: { account: any; onClo
     if (!accountName) { setError('Account name is required.'); return; }
     setLoading(true);
     try {
-      await accountsApi.update(account.id, {
+      await accountsService.update(account.id, {
         accountName,
         bankName: bankName || undefined,
         type,

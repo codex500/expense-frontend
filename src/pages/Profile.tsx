@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { budgetApi, dashboardApi, transactionsApi } from '@/api/endpoints';
+import { useState } from 'react';
+import { useAuthStore } from '@/store/authStore';
+import { dashboardService, transactionsService, budgetsService } from '@/services/endpoints';
 import { downloadPdf } from '@/utils/reportPdf';
 import { downloadCsv } from '@/utils/reportCsv';
 import { Button } from '@/components/ui/Button';
@@ -9,19 +9,19 @@ import { Card } from '@/components/ui/Card';
 import { useToast } from '@/hooks/useToast';
 
 export default function Profile() {
-  const { user, refreshUser } = useAuth();
-  const [budget, setBudget] = useState(String(user?.monthly_budget ?? 0));
+  const user = useAuthStore(state => state.user);
+  const [budget, setBudget] = useState('0');
   const [saving, setSaving] = useState(false);
   const { show } = useToast();
 
   const handleDownloadPdf = async () => {
     try {
-      const [d, t] = await Promise.all([dashboardApi.summary(), transactionsApi.list()]);
+      const [d, t] = await Promise.all([dashboardService.summary(), transactionsService.list()]);
       const s = d?.data?.data ?? {};
       const txList = t?.data?.data?.transactions ?? [];
       try {
         downloadPdf(
-          user?.name || 'User',
+          user?.fullName || 'User',
           user?.email || '',
           s.total_income ?? 0,
           s.total_expense ?? 0,
@@ -41,7 +41,7 @@ export default function Profile() {
 
   const handleDownloadCsv = async () => {
     try {
-      const { data } = await transactionsApi.list();
+      const { data } = await transactionsService.list();
       downloadCsv(data.data.transactions || []);
       show('CSV downloaded', 'success');
     } catch {
@@ -57,8 +57,11 @@ export default function Profile() {
     }
     setSaving(true);
     try {
-      await budgetApi.update(num);
-      await refreshUser();
+      await budgetsService.upsert({
+        scope: 'overall',
+        amountPaise: Math.round(num * 100),
+        month: new Date().toISOString().slice(0, 7) + '-01',
+      });
       show('Budget updated', 'success');
     } catch {
       show('Update failed', 'error');
@@ -72,7 +75,7 @@ export default function Profile() {
       <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Profile</h1>
       <Card className="min-w-0">
         <h2 className="mb-4 text-base sm:text-lg font-semibold text-slate-800 dark:text-white">Account</h2>
-        <p className="text-slate-600 dark:text-slate-400 break-words"><span className="font-medium">Name:</span> {user?.name}</p>
+        <p className="text-slate-600 dark:text-slate-400 break-words"><span className="font-medium">Name:</span> {user?.fullName}</p>
         <p className="mt-2 text-slate-600 dark:text-slate-400 break-all"><span className="font-medium">Email:</span> {user?.email}</p>
       </Card>
       <Card className="min-w-0">

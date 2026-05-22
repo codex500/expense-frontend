@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Send, Phone, CheckCircle2, AlertCircle } from 'lucide-react';
 
-import { contactApi } from '@/api/endpoints';
+import { contactApi } from '@/services/endpoints';
 import { SEO } from '@/components/ui/SEO';
 
 export function ContactUs() {

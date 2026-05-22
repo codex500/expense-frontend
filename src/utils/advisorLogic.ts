@@ -25,10 +25,10 @@ export function computeInsights(transactions: Transaction[], previousMonthExpens
 
   transactions.forEach((t) => {
     if (t.type !== 'expense') return;
-    const amt = Number(t.amount);
-    const d = new Date(t.transaction_date);
+    const amt = Number(t.amountPaise);
+    const d = new Date(t.transactionDate);
     byCategory[t.category] = (byCategory[t.category] || 0) + amt;
-    byPayment[t.payment_method || 'Other'] = (byPayment[t.payment_method || 'Other'] || 0) + amt;
+    byPayment[t.accountId || 'Other'] = (byPayment[t.accountId || 'Other'] || 0) + amt;
     if (d >= thisWeekStart) thisWeekExpense += amt;
     if (d >= lastMonthStart && d < thisMonthStart) lastWeekExpense += amt;
     if (d >= thisMonthStart) thisMonthExpense += amt;

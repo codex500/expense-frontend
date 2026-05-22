@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, Activity } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { api } from '@/api/axios';
+import { api } from '@/services/api';
 
 export function ResetPassword() {
   const [password, setPassword] = useState('');

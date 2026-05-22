@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, ArrowRight, User, Eye, EyeOff, AlertCircle, CheckCircle2, Phone, CreditCard, ChevronDown } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
 import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
 import { GenderSelect } from '@/components/ui/GenderSelect';
@@ -22,7 +22,7 @@ export function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register } = useAuthStore();
 
   // Password validation checks
   const hasMinLength = password.length >= 8;

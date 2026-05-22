@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-type Form = { name: string; email: string; password: string; monthly_budget?: string };
+type Form = { name: string; email: string; password: string; };
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { user, register: doRegister } = useAuth();
+  const { user, register: doRegister } = useAuthStore();
 
   if (user) return <Navigate to="/" replace />;
 
@@ -21,13 +21,10 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
-      const budgetVal = data.monthly_budget?.trim() ? Number(data.monthly_budget) : undefined;
-      const budget = budgetVal !== undefined && !Number.isNaN(budgetVal) && budgetVal >= 0 ? budgetVal : undefined;
       await doRegister(
         data.name.trim(),
         data.email.trim().toLowerCase(),
-        data.password,
-        budget
+        data.password
       );
       window.location.replace('/');
     } catch (err: unknown) {
@@ -56,7 +53,7 @@ export default function Register() {
             <Input label="Name" placeholder="Your name" error={errors.name?.message} {...register('name', { required: 'Name is required' })} />
             <Input label="Email" type="email" placeholder="you@example.com" error={errors.email?.message} {...register('email', { required: 'Email is required' })} />
             <Input label="Password" type="password" placeholder="••••••••" error={errors.password?.message} {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Min 6 characters' } })} />
-            <Input label="Monthly budget (optional)" type="number" step="0.01" placeholder="0" {...register('monthly_budget')} />
+
             {error && <p className="text-sm text-red-500">{error}</p>}
             <Button type="submit" className="w-full" loading={loading}>Sign up</Button>
           </form>

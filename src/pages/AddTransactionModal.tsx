@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { transactionsApi } from '@/api/endpoints';
+import { transactionsService } from '@/services/endpoints';
 import { useAccounts } from '@/hooks/useQueries';
 import type { AddTransactionInput } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -19,16 +19,16 @@ export function AddTransactionModal({ open, onClose, onSuccess }: AddTransaction
   const { data: accountsData } = useAccounts();
   const accounts = accountsData || [];
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<AddTransactionInput & { amount: string, accountId: string }>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Omit<AddTransactionInput, 'amountPaise'> & { amountPaise: string, accountId: string }>({
     defaultValues: { type: 'expense', transactionDate: new Date().toISOString().slice(0, 10) },
   });
   useEffect(() => { if (!open) reset(); }, [open, reset]);
 
-  const onSubmit = async (data: AddTransactionInput & { amount: string, accountId: string, transactionDate: string }) => {
+  const onSubmit = async (data: Omit<AddTransactionInput, 'amountPaise'> & { amountPaise: string, accountId: string, transactionDate: string }) => {
     try {
-      await transactionsApi.create({
+      await transactionsService.create({
         type: data.type,
-        amountPaise: Math.round(Number(data.amount) * 100),
+        amountPaise: Math.round(Number(data.amountPaise) * 100),
         category: data.category,
         accountId: data.accountId,
         note: data.note || undefined,
@@ -62,7 +62,7 @@ export function AddTransactionModal({ open, onClose, onSuccess }: AddTransaction
                 </label>
               </div>
             </div>
-            <Input label="Amount" type="number" step="0.01" required placeholder="0" error={errors.amount?.message} {...register('amount', { required: 'Required', min: { value: 0.01, message: 'Must be > 0' } })} />
+            <Input label="Amount" type="number" step="0.01" required placeholder="0" error={errors.amountPaise?.message} {...register('amountPaise', { required: 'Required', min: { value: 0.01, message: 'Must be > 0' } })} />
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">Category</label>
               <select {...register('category', { required: true })} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none">

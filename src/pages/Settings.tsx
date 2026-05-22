@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { User, Mail, Palette, Bell, LogOut, Moon, Sun, Monitor, Check, ChevronRight, Save, Phone, Calendar, Shield, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/endpoints';
 import { useThemeStore } from '@/store/themeStore';
-import { authApi } from '@/api/endpoints';
 import { CountryCodeSelect } from '@/components/ui/CountryCodeSelect';
 import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
 import { GenderSelect } from '@/components/ui/GenderSelect';
@@ -12,7 +12,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { startRegistration } from '@simplewebauthn/browser';
 
 export function Settings() {
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout, updateUser } = useAuthStore();
   const { theme, setTheme } = useThemeStore();
   const [activeSection, setActiveSection] = useState<string>('profile');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -32,7 +32,7 @@ export function Settings() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const { data } = await authApi.me();
+        const { data } = await authService.me();
         const p = data.data;
         setFullName(p.fullName || '');
         setDob(p.dob ? p.dob.split('T')[0] : '');
@@ -59,9 +59,12 @@ export function Settings() {
     setProfileLoading(true);
     try {
       const fullMobile = `${countryCode} ${mobileNumber.replace(/^\+?\d+\s*/, '')}`;
-      await authApi.updateProfile({ fullName, dob, mobileNumber: fullMobile, gender });
+      await authService.updateProfile({ fullName, dob, mobileNumber: fullMobile, gender });
       setProfileSuccess('Profile updated successfully!');
-      refreshUser();
+      try {
+        const { data: meData } = await authService.me();
+        updateUser(meData.data);
+      } catch { /* silently ignore refresh failure */ }
       setTimeout(() => setProfileSuccess(''), 3000);
     } catch (err: any) {
       setProfileError(err?.response?.data?.message || 'Failed to update profile.');
@@ -74,12 +77,12 @@ export function Settings() {
   const handleRegisterPasskey = async () => {
     setIsPasskeyRegistering(true);
     try {
-      const { data: generateData } = await authApi.registerPasskey();
-      const options = generateData.options;
+      const { data: generateData } = await authService.generatePasskeyRegistration();
+      const options = generateData.data;
 
       const attResp = await startRegistration({ optionsJSON: options });
 
-      await authApi.verifyPasskeyRegistration({ response: attResp });
+      await authService.verifyPasskeyRegistration(attResp);
       toast.success('Passkey added successfully!');
     } catch (err: any) {
       console.error(err);
@@ -114,7 +117,7 @@ export function Settings() {
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={async () => {
           try {
-            await authApi.deleteAccount();
+            await authService.deleteAccount();
             logout();
           } catch (err: any) {
             toast.error(err?.response?.data?.message || 'Failed to delete account.');

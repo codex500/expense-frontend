@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, AlertTriangle, CheckCircle2, Plus, X } from 'lucide-react';
 import { useBudgets } from '@/hooks/useQueries';
-import { budgetsApi } from '@/api/endpoints';
+import { budgetsService } from '@/services/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { toast } from 'sonner';
@@ -24,7 +24,7 @@ export function Budgets() {
 
   const handleDeleteBudget = async (id: string) => {
     try {
-      await budgetsApi.delete(id);
+      await budgetsService.delete(id);
       toast.success('Budget deleted successfully!');
       refetch();
     } catch (err: any) {
@@ -180,7 +180,7 @@ function AddBudgetModal({ open, onClose, onSuccess }: { open: boolean; onClose: 
     if (scope === 'category' && !category) { setError('Select a category.'); return; }
     setLoading(true);
     try {
-      await budgetsApi.create({
+      await budgetsService.create({
         scope,
         category: scope === 'category' ? category : undefined,
         amountPaise: Math.round(Number(amount) * 100),
@@ -261,7 +261,7 @@ function EditBudgetModal({ budget, open, onClose, onSuccess }: { budget: any; op
     if (!amount || Number(amount) <= 0) { setError('Enter a valid amount.'); return; }
     setLoading(true);
     try {
-      await budgetsApi.update(budget.id, {
+      await budgetsService.update(budget.id, {
         amountPaise: Math.round(Number(amount) * 100),
       });
       queryClient.invalidateQueries({ queryKey: ['budgets'] });

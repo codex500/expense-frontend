@@ -4,7 +4,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Activity, CreditCard, LayoutDashboard, Menu, PieChart, Settings, Wallet, Bell, Search, X, Sparkles, Moon, Sun, LogOut, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeStore } from '@/store/themeStore';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/store/authStore';
 import { AddTransactionModal } from '@/pages/AddTransactionModal';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -26,7 +26,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
   const { theme, setTheme } = useThemeStore();
-  const { user, logout } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [addTxnOpen, setAddTxnOpen] = useState(false);
   const queryClient = useQueryClient();
 
