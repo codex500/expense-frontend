@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, ArrowRight, TrendingDown, AlertCircle, Lightbulb, Bot, User, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvisorInsights, useDashboardAnalytics, useCategoryExpenseAnalytics, useBudgets, useAccounts } from '@/hooks/useQueries';
+import { useAdvisorInsights, useDashboardSummary, useCategoryExpenseAnalytics, useBudgets, useAccounts } from '@/hooks/useQueries';
 
 interface ChatMessage {
   id: string;
@@ -219,7 +219,7 @@ const QUICK_PROMPTS = [
 
 export function Advisor() {
   const { data: advisorData, isLoading: advisorLoading } = useAdvisorInsights();
-  const { data: dashData } = useDashboardAnalytics();
+  const { data: dashData } = useDashboardSummary();
   const { data: catData } = useCategoryExpenseAnalytics();
   const { data: budgetData } = useBudgets();
   const { data: accountData } = useAccounts();

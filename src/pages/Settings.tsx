@@ -39,10 +39,10 @@ export function Settings() {
         setGender(p.gender || '');
         setPanCard(p.pan ?? 'Not Provided');
         const rawMobile = p.phone || 'Not Available';
-        const match = rawMobile.match(/^(\+\d{1,4})\s+(.+)$/);
+        const match = rawMobile.match(/^(\+\d{1,4})\s*(.+)$/);
         if (match) {
           setCountryCode(match[1]);
-          setMobileNumber(match[2]);
+          setMobileNumber(match[2].trim());
         } else if (rawMobile !== 'Not Available') {
           setMobileNumber(rawMobile);
         } else {
@@ -58,8 +58,9 @@ export function Settings() {
     setProfileError(''); setProfileSuccess('');
     setProfileLoading(true);
     try {
-      const fullMobile = `${countryCode} ${mobileNumber.replace(/^\+?\d+\s*/, '')}`;
-      await authService.updateProfile({ fullName, dob, mobileNumber: fullMobile, gender });
+      const fullMobile = mobileNumber ? `${countryCode} ${mobileNumber}`.trim() : '';
+      const updateData = { fullName, dob, mobileNumber: fullMobile, gender, panCard: panCard !== 'Not provided' && panCard !== 'Not Provided' ? panCard : '' };
+      await authService.updateProfile(updateData);
       setProfileSuccess('Profile updated successfully!');
       try {
         const { data: meData } = await authService.me();
@@ -231,15 +232,17 @@ export function Settings() {
                     </label>
                     <GenderSelect value={gender} onChange={setGender} />
                   </div>
-                  {/* PAN - Read Only */}
+                  {/* PAN - Editable */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium flex items-center gap-2">
                       <Lock className="h-4 w-4 text-muted-foreground" /> PAN Card
-                      <span className="text-xs text-muted-foreground font-normal">(Read only)</span>
+                      <span className="text-xs text-muted-foreground font-normal">(Encrypted securely)</span>
                     </label>
                     <input
-                      type="text" value={panCard} readOnly
-                      className="h-12 w-full rounded-xl border border-input bg-muted/30 px-4 text-sm text-muted-foreground cursor-not-allowed uppercase"
+                      type="text" value={panCard === 'Not Provided' ? '' : panCard} 
+                      onChange={(e) => setPanCard(e.target.value.toUpperCase())}
+                      placeholder="ABCDE1234F"
+                      className="h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 uppercase"
                     />
                   </div>
                 </div>
