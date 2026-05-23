@@ -8,6 +8,9 @@ import { transactionsService, analyticsService, reportsService } from '@/service
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { useAuthStore } from '@/store/authStore';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 function formatPaise(paise: number): string {
   return (paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -32,20 +35,50 @@ export function Transactions() {
       )
     : transactions;
 
+  const user = useAuthStore(state => state.user);
+  
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await reportsService.downloadPdf();
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'transactions_history.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      if (!user) throw new Error("User not found");
+      const dobFormatted = user.dob ? user.dob.split('-').reverse().join('') : '01012000';
+      const namePrefix = (user.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
+      const password = `${dobFormatted}${namePrefix}`;
+
+      const doc = new jsPDF();
+      doc.setEncryption({
+        userPassword: password,
+        ownerPassword: password,
+        userPermissions: ['print', 'modify']
+      });
+
+      doc.setFontSize(20);
+      doc.text('Transaction History', 14, 22);
+      
+      doc.setFontSize(11);
+      doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 14, 32);
+      doc.text(`Total Transactions: ${transactions.length}`, 14, 38);
+
+      const tableData = transactions.map((t: any) => [
+        new Date(t.transactionDate || t.transaction_date).toLocaleDateString('en-IN'),
+        t.category,
+        t.accountName || '-',
+        t.note || '-',
+        t.type === 'expense' ? `-${formatPaise(t.amountPaise || t.amount_paise)}` : `+${formatPaise(t.amountPaise || t.amount_paise)}`
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [['Date', 'Category', 'Account', 'Note', 'Amount']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [99, 102, 241] }
+      });
+
+      doc.save('transactions_history.pdf');
       toast.success('History exported successfully!');
     } catch (err: any) {
-      toast.error('Failed to export PDF: ' + (err?.response?.data?.message || 'Server error'));
+      toast.error('Failed to export PDF: ' + (err?.message || 'Client error'));
     } finally {
       setIsExporting(false);
     }
