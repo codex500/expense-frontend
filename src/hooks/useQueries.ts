@@ -83,7 +83,7 @@ export const useTransactions = (params?: Record<string, any>) => {
     queryKey: ['transactions', params],
     queryFn: async () => {
       const { data } = await transactionsService.list(params);
-      return data.data;
+      return { transactions: data.data, meta: data.meta };
     },
     staleTime: 2 * 60 * 1000,
   });

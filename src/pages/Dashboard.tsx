@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { ArrowDownRight, ArrowUpRight, DollarSign, Wallet2, Sparkles, TrendingUp, TrendingDown } from 'lucide-react';
-import { useDashboardSummary } from '@/hooks/useQueries';
+import { useDashboardSummary, useWeeklyAnalytics } from '@/hooks/useQueries';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
@@ -15,6 +15,7 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export function Dashboard() {
   const user = useAuthStore((state) => state.user);
   const { data: summary, isLoading, error } = useDashboardSummary();
+  const { data: weeklyAnalytics } = useWeeklyAnalytics();
 
   useEffect(() => {
     if (error) {
@@ -22,14 +23,14 @@ export function Dashboard() {
     }
   }, [error]);
 
-  const income = Number(summary?.totalIncome) || 0;
-  const expense = Number(summary?.totalExpense) || 0;
-  const savings = income - expense > 0 ? income - expense : 0;
-  const netWorth = Number(summary?.balance) || 0;
+  const income = Number(summary?.currentMonth?.incomePaise) || 0;
+  const expense = Number(summary?.currentMonth?.expensePaise) || 0;
+  const savings = Number(summary?.currentMonth?.savingsPaise) || 0;
+  const netWorth = Number(summary?.totalBalancePaise) || 0;
 
   const transactions = summary?.recentTransactions || [];
 
-  const rawWeekly = summary?.weeklyData || [];
+  const rawWeekly = weeklyAnalytics || [];
   const chartData = rawWeekly.map((d: any) => {
     // Parse week timestamp into a readable label
     const weekDate = new Date(d.week);
@@ -38,7 +39,7 @@ export function Dashboard() {
       : 'Week';
     return {
       name: label,
-      spent: (Number(d.expense) || 0) / 100,
+      spent: (Number(d.expense_paise) || Number(d.expense) || 0) / 100,
     };
   });
 
