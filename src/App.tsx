@@ -104,14 +104,27 @@ function App() {
   }, [setAuth, logout]);
 
   useEffect(() => {
-    // Intercept Supabase default recovery links
+    // Intercept Supabase default recovery links and OAuth redirects
     if (typeof window !== 'undefined' && window.location.hash) {
       const hash = window.location.hash.substring(1);
       const params = new URLSearchParams(hash);
-      if (params.get('type') === 'recovery' && params.get('access_token')) {
-        window.location.href = `/reset-password#${hash}`;
-      } else if (params.get('type') === 'signup' && params.get('access_token')) {
-        window.location.href = `/verify-email#${hash}`;
+      const type = params.get('type');
+      const accessToken = params.get('access_token');
+      
+      if (accessToken) {
+        if (type === 'recovery') {
+          window.location.href = `/reset-password#${hash}`;
+        } else if (type === 'signup') {
+          window.location.href = `/verify-email#${hash}`;
+        } else {
+          // OAuth login callback
+          localStorage.setItem('token', accessToken);
+          const refreshToken = params.get('refresh_token');
+          if (refreshToken) {
+            localStorage.setItem('refresh_token', refreshToken);
+          }
+          window.location.href = '/dashboard';
+        }
       }
     }
   }, []);
