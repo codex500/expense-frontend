@@ -46,11 +46,6 @@ export function Transactions() {
       const password = `${dobFormatted}${namePrefix}`;
 
       const doc = new jsPDF();
-      doc.setEncryption({
-        userPassword: password,
-        ownerPassword: password,
-        userPermissions: ['print', 'modify']
-      });
 
       doc.setFontSize(20);
       doc.text('Transaction History', 14, 22);
