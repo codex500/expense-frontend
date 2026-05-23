@@ -3,6 +3,7 @@ import { Search, Filter, Plus, ArrowUpRight, ArrowDownRight, Calendar, CreditCar
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts } from '@/hooks/useQueries';
 import { useDebounce } from '@/hooks/useDebounce';
+import { CustomDatePicker } from '@/components/ui/CustomDatePicker';
 import { transactionsService, analyticsService, reportsService } from '@/services/endpoints';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -346,8 +347,7 @@ function AddTransactionModal({ open, onClose, onSuccess }: { open: boolean; onCl
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Date</label>
-              <input type="date" required value={date} onChange={(e) => setDate(e.target.value)}
-                className="h-12 w-full rounded-xl border border-input bg-background/50 px-4 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
+              <CustomDatePicker value={date} onChange={setDate} />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Note <span className="text-muted-foreground">(optional)</span></label>
