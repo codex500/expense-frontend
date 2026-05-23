@@ -5,6 +5,10 @@ export const authService = {
     api.post('/auth/login', { email, password }),
   register: (fullName: string, email: string, password: string, dob: string, gender?: string, mobileNumber?: string) =>
     api.post('/auth/signup', { fullName, email, password, dob, gender, mobileNumber }),
+  verifyEmail: (email: string, token: string) =>
+    api.post('/auth/verify-email', { email, token }),
+  resendVerification: (email: string) =>
+    api.post('/auth/resend-verification', { email }),
   me: () => api.get('/auth/me'),
   forgotPassword: (email: string) =>
     api.post('/auth/forgot-password', { email }),

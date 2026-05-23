@@ -74,7 +74,7 @@ export function VerifyEmail() {
     }
     setStatus('verifying');
     try {
-      await Promise.resolve({data:{success:true}});
+      await authService.verifyEmail(email, code);
       setStatus('success');
       setTimeout(() => navigate('/login'), 2500);
     } catch (err: any) {
@@ -89,7 +89,7 @@ export function VerifyEmail() {
     if (!email || cooldown > 0) return;
     setResending(true);
     try {
-      await Promise.resolve({data:{success:true}});
+      await authService.resendVerification(email);
       toast.success('New verification code sent!');
       setCooldown(60);
     } catch (err: any) {
