@@ -48,6 +48,9 @@ export function Settings() {
         } else {
           setMobileNumber('');
         }
+        setNotifExpense(p.notifyPush ?? true);
+        setNotifBudget(p.notifyBudget ?? true);
+        setNotifWeekly(p.notifyEmail ?? true);
       } catch {}
     };
     loadProfile();
@@ -59,7 +62,13 @@ export function Settings() {
     setProfileLoading(true);
     try {
       const fullMobile = mobileNumber ? `${countryCode} ${mobileNumber}`.trim() : '';
-      const updateData = { fullName, dob, mobileNumber: fullMobile, gender, panCard: panCard !== 'Not provided' && panCard !== 'Not Provided' ? panCard : '' };
+      const updateData = { 
+        fullName, dob, mobileNumber: fullMobile, gender, 
+        panCard: panCard !== 'Not provided' && panCard !== 'Not Provided' ? panCard : '',
+        notifyPush: notifExpense,
+        notifyBudget: notifBudget,
+        notifyEmail: notifWeekly
+      };
       await authService.updateProfile(updateData);
       setProfileSuccess('Profile updated successfully!');
       try {
@@ -179,6 +188,16 @@ export function Settings() {
                   {profileError}
                 </div>
               )}
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-border/50 bg-muted shadow-sm">
+                  <img src={user?.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.fullName || user?.email || 'U')}`} alt="Avatar" className="h-full w-full object-cover" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-sm">Profile Avatar</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">Automatically generated from your name using DiceBear.</p>
+                </div>
+              </div>
 
               <form onSubmit={handleSaveProfile} className="space-y-5">
                 {/* Full Name - Editable */}
@@ -308,7 +327,26 @@ export function Settings() {
                       <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
                     </div>
                     <button
-                      onClick={() => n.setter(!n.value)}
+                      onClick={async () => {
+                        const newVal = !n.value;
+                        n.setter(newVal);
+                        
+                        // Automatically save toggles when clicked
+                        try {
+                           const payload = {
+                             notifyPush: n.label === 'Expense Alerts' ? newVal : notifExpense,
+                             notifyBudget: n.label === 'Budget Warnings' ? newVal : notifBudget,
+                             notifyEmail: n.label === 'Weekly Summary' ? newVal : notifWeekly,
+                           };
+                           await authService.updateProfile(payload);
+                           const { data: meData } = await authService.me();
+                           updateUser(meData.data);
+                           toast.success('Notification settings saved.');
+                        } catch(err: any) {
+                           n.setter(!newVal);
+                           toast.error('Failed to update notification setting');
+                        }
+                      }}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${n.value ? 'bg-primary' : 'bg-muted'}`}
                     >
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${n.value ? 'translate-x-6' : 'translate-x-1'}`} />

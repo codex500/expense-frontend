@@ -209,8 +209,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
               )}
             </div>
             <Link to="/settings">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 text-primary font-semibold cursor-pointer border border-primary/20 hover:border-primary/40 transition-colors text-sm">
-                {userInitial}
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-primary/20 hover:border-primary/40 shadow-sm transition-colors cursor-pointer bg-muted">
+                <img src={user?.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.fullName || user?.email || 'U')}`} alt="Avatar" className="h-full w-full object-cover" />
               </div>
             </Link>
           </div>

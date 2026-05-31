@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://trackifyapp.space/sitemap.xml
+Sitemap: https://www.trackifyapp.space/sitemap.xml
