@@ -1,0 +1,719 @@
+react-doctor v0.2.14
+
+  
+
+  ✗ react-doctor/no-mutable-in-deps                ×2
+      Mutable global "location.*" in deps — values like `location.pathname` can change without triggering a re-render, so they can't drive effect re-runs. Subscribe with useSyncExternalStore or read inside the effect
+      → Read mutable values (`location.pathname`, `ref.current`) inside the effect body instead of in the deps array, or subscribe with `useSyncExternalStore`. Mutations to these don't trigger re-renders, so listing them in deps doesn't make the effect react to changes
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-mutable-in-deps.md
+      src/components/layout/AppLayout.tsx:57
+      src/components/layout/PublicLayout.tsx:21
+
+  ✗ react-doctor/require-reduced-motion
+      Project uses a motion library but has no prefers-reduced-motion handling — required for accessibility (WCAG 2.3.3)
+      → Add `useReducedMotion()` from your animation library, or a `@media (prefers-reduced-motion: reduce)` CSS query
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/require-reduced-motion.md
+      package.json
+
+  ✗ react-doctor/rules-of-hooks
+      React Hook `useForm` is called conditionally. React Hooks must be called in the same order on every render.
+      → Call hooks at the top level of a React function component or a custom Hook.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/rules-of-hooks.md
+      src/pages/Register.tsx:18
+
+  ⚠ react-doctor/design-no-redundant-size-axes     ×228
+      w-9 h-9 → use the shorthand size-9 (Tailwind v3.4+)
+      → Collapse `w-N h-N` to `size-N` (Tailwind v3.4+) when both axes match
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/design-no-redundant-size-axes.md
+      src/pages/ResetPassword.tsx:64
+      src/pages/ResetPassword.tsx:65
+      src/pages/ResetPassword.tsx:76
+      src/pages/ResetPassword.tsx:77
+      src/pages/ResetPassword.tsx:95
+      src/pages/ResetPassword.tsx:96
+      src/pages/ResetPassword.tsx:114
+      src/pages/ResetPassword.tsx:130
+      src/pages/ResetPassword.tsx:141
+      src/pages/ResetPassword.tsx:141
+      src/pages/ResetPassword.tsx:149
+      src/pages/ResetPassword.tsx:163
+      src/components/common/EmptyState.tsx:7
+      src/components/common/EmptyState.tsx:8
+      src/pages/About.tsx:21
+      src/pages/Transactions.tsx:144
+      src/pages/Transactions.tsx:144
+      src/pages/Transactions.tsx:151
+      src/pages/Transactions.tsx:160
+      src/pages/Transactions.tsx:199
+      src/pages/Transactions.tsx:214
+      src/pages/Transactions.tsx:221
+      src/pages/Transactions.tsx:227
+      src/pages/Transactions.tsx:259
+      src/pages/Transactions.tsx:259
+      src/pages/Transactions.tsx:274
+      src/pages/Transactions.tsx:277
+      src/pages/Transactions.tsx:277
+      src/pages/Transactions.tsx:297
+      src/pages/Transactions.tsx:297
+      src/pages/Transactions.tsx:311
+      src/pages/Transactions.tsx:313
+      src/pages/Transactions.tsx:313
+      src/pages/Transactions.tsx:392
+      src/pages/Transactions.tsx:438
+      src/components/layout/AppLayout.tsx:85
+      src/components/layout/AppLayout.tsx:86
+      src/components/layout/AppLayout.tsx:91
+      src/components/layout/AppLayout.tsx:113
+      src/components/layout/AppLayout.tsx:127
+      src/components/layout/AppLayout.tsx:135
+      src/components/layout/AppLayout.tsx:148
+      src/components/layout/AppLayout.tsx:153
+      src/components/layout/AppLayout.tsx:175
+      src/components/layout/AppLayout.tsx:175
+      src/components/layout/AppLayout.tsx:182
+      src/components/layout/AppLayout.tsx:184
+      src/components/layout/AppLayout.tsx:197
+      src/components/layout/AppLayout.tsx:222
+      src/components/layout/AppLayout.tsx:245
+      src/components/layout/AppLayout.tsx:249
+      src/components/layout/AppLayout.tsx:254
+      src/components/layout/AppLayout.tsx:255
+      src/components/layout/AppLayout.tsx:260
+      src/components/layout/AppLayout.tsx:264
+      src/components/layout/AppLayout.tsx:273
+      src/components/layout/AppLayout.tsx:276
+      src/pages/Analytics.tsx:48
+      src/pages/Analytics.tsx:64
+      src/pages/Analytics.tsx:64
+      src/pages/Analytics.tsx:67
+      src/pages/Analytics.tsx:120
+      src/components/layout/Navbar.tsx:16
+      src/components/layout/Navbar.tsx:19
+      src/components/ui/Button.tsx:28
+      src/pages/ForgotPassword.tsx:29
+      src/pages/ForgotPassword.tsx:30
+      src/pages/ForgotPassword.tsx:38
+      src/pages/ForgotPassword.tsx:39
+      src/pages/ForgotPassword.tsx:45
+      src/pages/ForgotPassword.tsx:46
+      src/pages/ForgotPassword.tsx:54
+      src/pages/ForgotPassword.tsx:70
+      src/pages/ForgotPassword.tsx:79
+      src/pages/ForgotPassword.tsx:97
+      src/pages/ForgotPassword.tsx:99
+      src/pages/ForgotPassword.tsx:106
+      src/components/common/Loader.tsx:6
+      src/components/ui/Logo.tsx:6
+      src/components/ui/Logo.tsx:7
+      src/pages/Signup.tsx:70
+      src/pages/Signup.tsx:71
+      src/pages/Signup.tsx:72
+      src/pages/Signup.tsx:75
+      src/pages/Signup.tsx:76
+      src/pages/Signup.tsx:121
+      src/pages/Signup.tsx:122
+      src/pages/Signup.tsx:138
+      src/pages/Signup.tsx:139
+      src/pages/Signup.tsx:152
+      src/pages/Signup.tsx:161
+      src/pages/Signup.tsx:209
+      src/pages/Signup.tsx:225
+      src/pages/Signup.tsx:240
+      src/pages/Signup.tsx:254
+      src/pages/Signup.tsx:254
+      src/pages/Signup.tsx:287
+      src/pages/Signup.tsx:289
+      src/pages/Signup.tsx:315
+      src/App.tsx:36
+      src/App.tsx:37
+      src/App.tsx:68
+      src/App.tsx:69
+      src/pages/Accounts.tsx:59
+      src/pages/Accounts.tsx:83
+      src/pages/Accounts.tsx:91
+      src/pages/Accounts.tsx:92
+      src/pages/Accounts.tsx:104
+      src/pages/Accounts.tsx:123
+      src/pages/Accounts.tsx:141
+      src/pages/Accounts.tsx:142
+      src/pages/Accounts.tsx:143
+      src/pages/Accounts.tsx:201
+      src/pages/Accounts.tsx:233
+      src/pages/Accounts.tsx:290
+      src/pages/Accounts.tsx:318
+      src/components/ui/ConfirmDialog.tsx:32
+      src/components/ui/ConfirmDialog.tsx:33
+      src/components/ui/ConfirmDialog.tsx:36
+      src/components/ui/ConfirmDialog.tsx:41
+      src/pages/Budgets.tsx:40
+      src/pages/Budgets.tsx:66
+      src/pages/Budgets.tsx:87
+      src/pages/Budgets.tsx:87
+      src/pages/Budgets.tsx:101
+      src/pages/Budgets.tsx:208
+      src/pages/Budgets.tsx:241
+      src/pages/Budgets.tsx:287
+      src/pages/Budgets.tsx:305
+      src/components/ui/GenderSelect.tsx:70
+      src/components/ui/CountryCodeSelect.tsx:64
+      src/components/layout/Sidebar.tsx:38
+      src/pages/Support.tsx:119
+      src/pages/Support.tsx:124
+      src/pages/Support.tsx:134
+      src/pages/Support.tsx:136
+      src/components/TransactionTable.tsx:50
+      src/pages/Settings.tsx:157
+      src/pages/Settings.tsx:164
+      src/pages/Settings.tsx:183
+      src/pages/Settings.tsx:193
+      src/pages/Settings.tsx:205
+      src/pages/Settings.tsx:214
+      src/pages/Settings.tsx:224
+      src/pages/Settings.tsx:230
+      src/pages/Settings.tsx:250
+      src/pages/Settings.tsx:257
+      src/pages/Settings.tsx:273
+      src/pages/Settings.tsx:273
+      src/pages/Settings.tsx:296
+      src/pages/Settings.tsx:297
+      src/pages/Settings.tsx:371
+      src/pages/Settings.tsx:372
+      src/pages/Settings.tsx:386
+      src/pages/Settings.tsx:387
+      src/pages/Settings.tsx:397
+      src/pages/Settings.tsx:398
+      src/pages/Settings.tsx:409
+      src/pages/Settings.tsx:410
+      src/pages/Advisor.tsx:279
+      src/pages/Advisor.tsx:291
+      src/pages/Advisor.tsx:292
+      src/pages/Advisor.tsx:304
+      src/pages/Advisor.tsx:321
+      src/pages/Advisor.tsx:321
+      src/pages/Advisor.tsx:341
+      src/pages/Advisor.tsx:342
+      src/pages/Advisor.tsx:346
+      src/pages/Advisor.tsx:347
+      src/pages/Advisor.tsx:348
+      src/pages/Advisor.tsx:386
+      src/pages/Advisor.tsx:388
+      src/pages/Dashboard.tsx:106
+      src/pages/Dashboard.tsx:120
+      src/pages/Dashboard.tsx:157
+      src/pages/Dashboard.tsx:169
+      src/pages/Dashboard.tsx:170
+      src/pages/Dashboard.tsx:171
+      src/pages/VerifyEmail.tsx:105
+      src/pages/VerifyEmail.tsx:106
+      src/pages/VerifyEmail.tsx:114
+      src/pages/VerifyEmail.tsx:115
+      src/pages/VerifyEmail.tsx:123
+      src/pages/VerifyEmail.tsx:124
+      src/pages/VerifyEmail.tsx:133
+      src/pages/VerifyEmail.tsx:148
+      src/pages/VerifyEmail.tsx:184
+      src/pages/VerifyEmail.tsx:184
+      src/pages/Login.tsx:78
+      src/pages/Login.tsx:79
+      src/pages/Login.tsx:80
+      src/pages/Login.tsx:83
+      src/pages/Login.tsx:84
+      src/pages/Login.tsx:124
+      src/pages/Login.tsx:125
+      src/pages/Login.tsx:138
+      src/pages/Login.tsx:148
+      src/pages/Login.tsx:165
+      src/pages/Login.tsx:179
+      src/pages/Login.tsx:179
+      src/pages/Login.tsx:191
+      src/pages/Login.tsx:193
+      src/pages/Login.tsx:219
+      src/pages/Login.tsx:234
+      src/components/layout/PublicLayout.tsx:43
+      src/components/layout/PublicLayout.tsx:44
+      src/components/layout/PublicLayout.tsx:90
+      src/components/layout/PublicLayout.tsx:90
+      src/components/layout/PublicLayout.tsx:142
+      src/components/layout/PublicLayout.tsx:143
+      src/pages/ContactUs.tsx:34
+      src/pages/ContactUs.tsx:61
+      src/pages/ContactUs.tsx:62
+      src/pages/ContactUs.tsx:134
+      src/pages/ContactUs.tsx:139
+      src/pages/ContactUs.tsx:149
+      src/pages/ContactUs.tsx:151
+      src/pages/Home.tsx:20
+      src/pages/Home.tsx:21
+      src/pages/Home.tsx:22
+      src/pages/Home.tsx:31
+      src/pages/Home.tsx:63
+      src/pages/Home.tsx:85
+      src/pages/Home.tsx:86
+      src/pages/Home.tsx:87
+      src/pages/Home.tsx:239
+      src/pages/Home.tsx:253
+      src/pages/Home.tsx:270
+
+  ⚠ react-doctor/button-has-type                   ×41
+      `<button>` elements must have an explicit `type` attribute.
+      → Set `type="button"` (or `"submit"` / `"reset"`) explicitly on every `<button>`.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/button-has-type.md
+      src/pages/Transactions.tsx:139
+      src/pages/Transactions.tsx:147
+      src/pages/Transactions.tsx:176
+      src/pages/Transactions.tsx:271
+      src/pages/Transactions.tsx:308
+      src/pages/Transactions.tsx:392
+      src/components/layout/AppLayout.tsx:90
+      src/components/layout/AppLayout.tsx:131
+      src/components/layout/AppLayout.tsx:144
+      src/components/layout/AppLayout.tsx:171
+      src/components/layout/AppLayout.tsx:178
+      src/components/layout/AppLayout.tsx:254
+      src/components/layout/AppLayout.tsx:271
+      src/pages/Analytics.tsx:63
+      src/pages/Analytics.tsx:66
+      src/components/ui/Button.tsx:22
+      src/pages/Accounts.tsx:82
+      src/pages/Accounts.tsx:141
+      src/pages/Accounts.tsx:142
+      src/pages/Accounts.tsx:201
+      src/pages/Accounts.tsx:290
+      src/components/ui/ConfirmDialog.tsx:36
+      src/components/ui/ConfirmDialog.tsx:40
+      src/components/ui/ConfirmDialog.tsx:41
+      src/pages/Budgets.tsx:65
+      src/pages/Budgets.tsx:127
+      src/pages/Budgets.tsx:130
+      src/pages/Budgets.tsx:208
+      src/pages/Budgets.tsx:287
+      src/components/ui/CountryCodeSelect.tsx:51
+      src/pages/Settings.tsx:150
+      src/pages/Settings.tsx:163
+      src/pages/Settings.tsx:288
+      src/pages/Settings.tsx:329
+      src/pages/Settings.tsx:417
+      src/pages/Settings.tsx:438
+      src/pages/Advisor.tsx:299
+      src/pages/Advisor.tsx:360
+      src/pages/VerifyEmail.tsx:169
+      src/pages/VerifyEmail.tsx:179
+      src/components/layout/PublicLayout.tsx:86
+
+  ⚠ react-doctor/label-has-associated-control      ×38
+      A form label must be associated with a control — use `htmlFor` or nest the input.
+      → Associate every label with a control via `htmlFor` or by nesting the input.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/label-has-associated-control.md
+      src/pages/ResetPassword.tsx:128
+      src/pages/ResetPassword.tsx:147
+      src/pages/Transactions.tsx:406
+      src/pages/Transactions.tsx:411
+      src/pages/Transactions.tsx:419
+      src/pages/Transactions.tsx:427
+      src/pages/Transactions.tsx:431
+      src/pages/ForgotPassword.tsx:77
+      src/pages/Signup.tsx:159
+      src/pages/Signup.tsx:176
+      src/pages/Signup.tsx:181
+      src/pages/Signup.tsx:189
+      src/pages/Signup.tsx:207
+      src/pages/Signup.tsx:223
+      src/pages/Signup.tsx:238
+      src/pages/Accounts.tsx:206
+      src/pages/Accounts.tsx:211
+      src/pages/Accounts.tsx:216
+      src/pages/Accounts.tsx:226
+      src/pages/Accounts.tsx:296
+      src/pages/Accounts.tsx:301
+      src/pages/Accounts.tsx:306
+      src/pages/Budgets.tsx:213
+      src/pages/Budgets.tsx:224
+      src/pages/Budgets.tsx:233
+      src/pages/Budgets.tsx:292
+      src/pages/Budgets.tsx:298
+      src/pages/Settings.tsx:205
+      src/pages/Settings.tsx:214
+      src/pages/Settings.tsx:224
+      src/pages/Settings.tsx:230
+      src/pages/Settings.tsx:249
+      src/pages/Settings.tsx:256
+      src/pages/Login.tsx:146
+      src/pages/Login.tsx:161
+      src/pages/AddTransactionModal.tsx:53
+      src/pages/AddTransactionModal.tsx:67
+      src/pages/AddTransactionModal.tsx:76
+
+  ⚠ react-doctor/control-has-associated-label      ×33
+      A control must be associated with a text label — add visible text, `aria-label`, or `aria-labelledby`.
+      → Every interactive control must have an accessible label.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/control-has-associated-label.md
+      src/pages/ResetPassword.tsx:131
+      src/pages/ResetPassword.tsx:150
+      src/pages/Transactions.tsx:176
+      src/pages/Transactions.tsx:200
+      src/pages/Transactions.tsx:407
+      src/pages/Transactions.tsx:432
+      src/components/layout/AppLayout.tsx:154
+      src/pages/ForgotPassword.tsx:80
+      src/components/ui/CustomDatePicker.tsx:51
+      src/pages/Signup.tsx:162
+      src/pages/Signup.tsx:195
+      src/pages/Signup.tsx:210
+      src/pages/Signup.tsx:226
+      src/pages/Signup.tsx:241
+      src/pages/Accounts.tsx:207
+      src/pages/Accounts.tsx:212
+      src/pages/Accounts.tsx:227
+      src/pages/Accounts.tsx:297
+      src/pages/Accounts.tsx:302
+      src/pages/Budgets.tsx:127
+      src/pages/Budgets.tsx:130
+      src/pages/Budgets.tsx:234
+      src/pages/Budgets.tsx:299
+      src/components/TransactionTable.tsx:35
+      src/pages/Settings.tsx:206
+      src/pages/Settings.tsx:215
+      src/pages/Settings.tsx:236
+      src/pages/Settings.tsx:260
+      src/pages/Settings.tsx:329
+      src/pages/Advisor.tsx:374
+      src/pages/VerifyEmail.tsx:156
+      src/pages/Login.tsx:149
+      src/pages/Login.tsx:166
+
+  ⚠ deslop/unused-file                             ×22
+      Unused file — not reachable from any entry point
+      → Delete the file if it is truly unreachable, or import it from an entry point.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/deslop/unused-file.md
+      fix_advisor.js
+      fix_frontend.cjs
+      fix_frontend.js
+      src/components/ChartCard.tsx
+      src/components/TransactionTable.tsx
+      src/components/common/EmptyState.tsx
+      src/components/common/Loader.tsx
+      src/components/common/Toast.tsx
+      src/components/layout/Navbar.tsx
+      src/components/layout/Sidebar.tsx
+      src/components/ui/Card.tsx
+      src/components/ui/Logo.tsx
+      src/context/LayoutContext.tsx
+      src/context/ThemeContext.tsx
+      src/context/ToastContext.tsx
+      src/hooks/useToast.ts
+      src/pages/Profile.tsx
+      src/pages/Register.tsx
+      src/types/toast.ts
+      src/utils/advisorLogic.ts
+      src/utils/reportCsv.ts
+      test_pdf.js
+
+  ⚠ react-doctor/use-lazy-motion                   ×19
+      Import "m" with LazyMotion instead of "motion" — saves ~30kb in bundle size
+      → Use `import { LazyMotion, m } from "framer-motion"` with `domAnimation` features — saves ~30kb
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/use-lazy-motion.md
+      src/pages/ResetPassword.tsx:4
+      src/pages/About.tsx:1
+      src/pages/Transactions.tsx:4
+      src/components/layout/AppLayout.tsx:2
+      src/pages/ForgotPassword.tsx:2
+      src/pages/Signup.tsx:2
+      src/pages/Accounts.tsx:2
+      src/components/ui/ConfirmDialog.tsx:2
+      src/pages/Budgets.tsx:2
+      src/components/ui/GenderSelect.tsx:3
+      src/components/ui/CountryCodeSelect.tsx:3
+      src/pages/Support.tsx:2
+      src/pages/Settings.tsx:3
+      src/pages/Advisor.tsx:3
+      src/pages/VerifyEmail.tsx:2
+      src/pages/Login.tsx:2
+      src/components/layout/PublicLayout.tsx:3
+      src/pages/ContactUs.tsx:2
+      src/pages/Home.tsx:1
+
+  ⚠ deslop/unused-dependency                       ×13
+      Unused dependency: `@headlessui/react`
+      → Remove the dependency from package.json if it is genuinely unused.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/deslop/unused-dependency.md
+      package.json
+
+  ⚠ react-doctor/prefer-useReducer                 ×10
+      Component "ResetPassword" has 7 useState calls — consider useReducer for related state
+      → Group related state: `const [state, dispatch] = useReducer(reducer, { field1, field2, ... })`
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/prefer-useReducer.md
+      src/pages/ResetPassword.tsx:7
+      src/pages/Transactions.tsx:22
+      src/pages/Transactions.tsx:335
+      src/pages/Signup.tsx:11
+      src/pages/Accounts.tsx:160
+      src/pages/Accounts.tsx:244
+      src/pages/Budgets.tsx:166
+      src/pages/Settings.tsx:14
+      src/pages/VerifyEmail.tsx:8
+      src/pages/Login.tsx:11
+
+  ⚠ react-doctor/design-no-redundant-padding-axes  ×6
+      px-4 py-4 → use the shorthand p-4
+      → Collapse `px-N py-N` to `p-N` when both axes match. Keep them split only when one axis varies at a breakpoint (`py-2 md:py-3`)
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/design-no-redundant-padding-axes.md
+      src/pages/Transactions.tsx:254
+      src/pages/Transactions.tsx:264
+      src/pages/Transactions.tsx:265
+      src/pages/Transactions.tsx:266
+      src/pages/Transactions.tsx:270
+      src/components/layout/AppLayout.tsx:95
+
+  ⚠ react-doctor/anchor-is-valid                   ×6
+      `<a>` element has invalid `href` (`#`, `javascript:`, or empty) — provide a real destination.
+      → Anchors must have a valid destination — use `<button>` for in-page actions.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/anchor-is-valid.md
+      src/components/layout/PublicLayout.tsx:162
+      src/components/layout/PublicLayout.tsx:163
+      src/components/layout/PublicLayout.tsx:164
+      src/components/layout/PublicLayout.tsx:171
+      src/components/layout/PublicLayout.tsx:172
+      src/components/layout/PublicLayout.tsx:173
+
+  ⚠ react-doctor/jsx-pascal-case                   ×5
+      JSX component `SEO` must be in PascalCase.
+      → Rename custom JSX components to PascalCase.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/jsx-pascal-case.md
+      src/pages/About.tsx:14
+      src/pages/Signup.tsx:61
+      src/pages/Login.tsx:69
+      src/pages/ContactUs.tsx:28
+      src/pages/Home.tsx:14
+
+  ⚠ react-doctor/prefer-module-scope-static-value  ×5
+      `notifications` inside `AppLayout` doesn't depend on any local state. Move it to module scope so the allocation happens once and memoised consumers see a stable reference.
+      → Move the constant to module scope (above the component). It doesn't reference any local state, so the per-render allocation is wasted and any memoised consumer sees a fresh reference each render.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/prefer-module-scope-static-value.md
+      src/components/layout/AppLayout.tsx:37
+      src/pages/Analytics.tsx:11
+      src/pages/Settings.tsx:110
+      src/pages/Settings.tsx:116
+      src/components/layout/PublicLayout.tsx:23
+
+  ⚠ react-doctor/no-array-index-as-key             ×5
+      Array index "i" used as key — causes bugs when list is reordered or filtered
+      → Use a stable unique identifier: `key={item.id}` or `key={item.slug}` — index keys break on reorder/filter
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-array-index-as-key.md
+      src/components/layout/AppLayout.tsx:202
+      src/pages/Analytics.tsx:91
+      src/pages/Advisor.tsx:329
+      src/pages/Advisor.tsx:329
+      src/pages/VerifyEmail.tsx:157
+
+  ⚠ react-doctor/design-no-three-period-ellipsis   ×5
+      Three-period ellipsis ("...") in JSX text — use the actual ellipsis character "…" (or `&hellip;`)
+      → Use the typographic ellipsis "…" (or `&hellip;`) instead of three periods — pairs with action-with-followup labels ("Rename…", "Loading…")
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/design-no-three-period-ellipsis.md
+      src/pages/Analytics.tsx:49
+      src/pages/Advisor.tsx:280
+      src/pages/VerifyEmail.tsx:128
+      src/pages/VerifyEmail.tsx:135
+      src/pages/VerifyEmail.tsx:136
+
+  ⚠ react-doctor/no-event-handler                  ×5
+      Avoid using state and effects as an event handler. Instead, call the event handling code directly when the event occurs.
+      → Move the side effect into the event handler that triggers it, instead of guarding on its state inside a useEffect. See https://react.dev/learn/you-might-not-need-an-effect#sharing-logic-between-event-handlers
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-event-handler.md
+      src/components/ui/CustomDatePicker.tsx:13
+      src/components/ui/CustomDatePicker.tsx:13
+      src/pages/Accounts.tsx:253
+      src/pages/Advisor.tsx:243
+      src/pages/AddTransactionModal.tsx:25
+
+  ⚠ react-doctor/no-derived-state                  ×4
+      Avoid storing derived state. Compute "displayValue" directly during render, optionally with `useMemo` if it's expensive.
+      → Compute derived state inline during render (or with useMemo if expensive) instead of mirroring it into useState via a useEffect. See https://react.dev/learn/you-might-not-need-an-effect#updating-state-based-on-props-or-state
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-derived-state.md
+      src/components/ui/CustomDatePicker.tsx:16
+      src/pages/Accounts.tsx:254
+      src/pages/Accounts.tsx:255
+      src/pages/Accounts.tsx:256
+
+  ⚠ react-doctor/rendering-hydration-mismatch-time ×4
+      new Date() reachable from JSX renders differently on server vs client — wrap in useEffect+useState (client-only) or add suppressHydrationWarning to the parent if intentional
+      → Wrap dynamic time/random values in useEffect+useState (client-only) or add suppressHydrationWarning to the parent if intentional
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/rendering-hydration-mismatch-time.md
+      src/pages/Signup.tsx:106
+      src/pages/Budgets.tsx:237
+      src/pages/Login.tsx:110
+      src/components/layout/PublicLayout.tsx:169
+
+  ⚠ deslop/unused-export                           ×4
+      Unused export: `useDashboardAnalytics`
+      → Drop the `export` keyword (or remove the declaration) if no other module uses this symbol.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/deslop/unused-export.md
+      src/hooks/useQueries.ts:25
+      src/hooks/useQueries.ts:92
+      src/hooks/useQueries.ts:136
+      src/services/endpoints.ts:69
+
+  ⚠ react-doctor/no-initialize-state               ×3
+      Avoid initializing state in an effect. Instead, initialize "error"'s `useState()` with "'Invalid or expired reset link. Please request a new one.'". For SSR hydration, prefer `useSyncExternalStore()`.
+      → Pass the initial value directly to useState() instead of setting it from a mount-only useEffect. For SSR hydration, prefer useSyncExternalStore().
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-initialize-state.md
+      src/pages/ResetPassword.tsx:25
+      src/pages/ResetPassword.tsx:27
+      src/pages/Settings.tsx:56
+
+  ⚠ react-doctor/no-gradient-text                  ×3
+      Gradient text (bg-clip-text + bg-gradient) is decorative rather than meaningful — a common AI tell. Use solid colors for text
+      → Use solid text colors for readability. If you need emphasis, use font weight, size, or a distinct color instead of gradients
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-gradient-text.md
+      src/pages/ResetPassword.tsx:70
+      src/pages/ResetPassword.tsx:101
+      src/components/layout/Navbar.tsx:23
+
+  ⚠ react-doctor/no-giant-component                ×3
+      Component "Transactions" is 311 lines — consider breaking it into smaller focused components
+      → Extract logical sections into focused components: `<UserHeader />`, `<UserActions />`, etc.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-giant-component.md
+      src/pages/Transactions.tsx:22
+      src/pages/Signup.tsx:11
+      src/pages/Settings.tsx:14
+
+  ⚠ react-doctor/rerender-lazy-state-init          ×3
+      useState(slice()) calls initializer on every render — use useState(() => slice()) for lazy initialization
+      → Wrap in an arrow function so it only runs once: `useState(() => expensiveComputation())`
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/rerender-lazy-state-init.md
+      src/pages/Transactions.tsx:341
+      src/pages/Budgets.tsx:253
+      src/pages/VerifyEmail.tsx:9
+
+  ⚠ react-doctor/no-array-index-key                ×3
+      Array index in `key` doesn't uniquely identify the element — re-renders may use stale state.
+      → Use a stable, data-derived `key` instead of the array index.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-array-index-key.md
+      src/components/layout/AppLayout.tsx:202
+      src/pages/Analytics.tsx:91
+      src/pages/VerifyEmail.tsx:157
+
+  ⚠ react-doctor/no-inline-bounce-easing           ×3
+      animate-bounce feels dated and tacky — use a subtle ease-out transform for natural deceleration
+      → Use `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo) for natural deceleration — objects in the real world don't bounce
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-inline-bounce-easing.md
+      src/pages/Advisor.tsx:346
+      src/pages/Advisor.tsx:347
+      src/pages/Advisor.tsx:348
+
+  ⚠ react-doctor/prefer-dynamic-import             ×2
+      "recharts" is a heavy library — use React.lazy() or next/dynamic for code splitting
+      → Use `const Component = dynamic(() => import('library'), { ssr: false })` from next/dynamic or React.lazy()
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/prefer-dynamic-import.md
+      src/pages/Analytics.tsx:1
+      src/components/dashboard/DashboardChart.tsx:1
+
+  ⚠ react-doctor/exhaustive-deps                   ×2
+      React Hook `useEffect` is missing dependency `displayValue` — list it in the dependency array, or call the hook unconditionally.
+      → Don't blindly add missing dependencies. Read the hook callback first.
+      
+      Bad:
+      useEffect(() => {
+        setCount(count + 1);
+      }, [count]);
+      
+      Better:
+      useEffect(() => {
+        setCount((currentCount) => currentCount + 1);
+      }, []);
+      
+      If the missing value is recreated every render, move it inside the hook or stabilize it before adding it to deps.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/exhaustive-deps.md
+      src/components/ui/CustomDatePicker.tsx:19
+      src/pages/Advisor.tsx:252
+
+  ⚠ react-doctor/js-min-max-loop                   ×2
+      array.sort()[0] for min/max — use Math.min(...array) instead (O(n) vs O(n log n))
+      → Use `Math.min(...array)` / `Math.max(...array)` instead of sorting just to read the first or last element
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/js-min-max-loop.md
+      src/utils/advisorLogic.ts:37
+      src/utils/advisorLogic.ts:38
+
+  ⚠ react-doctor/design-no-space-on-flex-children  ×2
+      space-y-1.5 on a flex/grid parent — use gap-y-1.5 instead. Per-sibling margins phantom-gap on conditional render and don't mirror in RTL
+      → Use `gap-*` on the flex/grid parent. `space-x-*` / `space-y-*` produce phantom gaps when a sibling is conditionally rendered, lose vertical spacing on wrapped lines, and don't mirror in RTL
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/design-no-space-on-flex-children.md
+      src/pages/Dashboard.tsx:136
+      src/pages/Dashboard.tsx:148
+
+  ⚠ deslop/unused-dev-dependency                   ×2
+      Unused devDependency: `msw`
+      → Remove the dependency from package.json if it is genuinely unused.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/deslop/unused-dev-dependency.md
+      package.json
+
+  ⚠ react-doctor/design-no-em-dash-in-jsx-text
+      Em dash (—) in JSX text reads as model output — replace with comma, colon, semicolon, or parentheses
+      → Replace em dashes in JSX prose with commas, colons, semicolons, or parentheses so UI copy reads less like generated text.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/design-no-em-dash-in-jsx-text.md
+      src/pages/About.tsx:40
+
+  ⚠ react-doctor/click-events-have-key-events
+      Visible non-interactive elements with click handlers must have a corresponding keyboard listener (`onKeyUp`, `onKeyDown`, or `onKeyPress`).
+      → Pair `onClick` with `onKeyUp` / `onKeyDown` / `onKeyPress` for keyboard users.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/click-events-have-key-events.md
+      src/components/layout/AppLayout.tsx:189
+
+  ⚠ react-doctor/no-static-element-interactions
+      Static HTML elements with event handlers require a role — add `role="…"` or use a semantic HTML element instead.
+      → Static HTML elements with event handlers require a role, or use a semantic HTML element instead.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-static-element-interactions.md
+      src/components/layout/AppLayout.tsx:189
+
+  ⚠ react-doctor/no-generic-handler-names
+      Non-descriptive handler name "handleChange" — name should describe what it does, not when it runs
+      → Rename to describe the action: e.g. `handleSubmit` → `saveUserProfile`, `handleClick` → `toggleSidebar`
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-generic-handler-names.md
+      src/components/ui/CustomDatePicker.tsx:54
+
+  ⚠ react-doctor/no-cascading-set-state
+      3 setState calls in a single useEffect — consider using useReducer or deriving state
+      → Combine into useReducer: `const [state, dispatch] = useReducer(reducer, initialState)`
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-cascading-set-state.md
+      src/pages/Accounts.tsx:252
+
+  ⚠ react-doctor/jsx-no-constructed-context-values
+      Context `value` prop is constructed inline — wrap with `useMemo`/`useCallback` or hoist a constant to avoid re-renders.
+      → Memoize the context value (`useMemo`) or hoist it outside the render.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/jsx-no-constructed-context-values.md
+      src/context/LayoutContext.tsx:25
+
+  ⚠ react-doctor/js-index-maps
+      array.find() in a loop is O(n*m) — build a Map for O(1) lookups
+      → Build an index `Map` once outside the loop instead of `array.find(...)` inside it
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/js-index-maps.md
+      src/pages/Advisor.tsx:109
+
+  ⚠ react-doctor/no-effect-chain
+      useEffect reacts to "messages" which is set by another useEffect — chains of effects add an extra render per link and become rigid as code evolves. Compute what you can during render and write all related state inside the event handler that originally fires the chain
+      → Compute as much as possible during render (e.g. `const isGameOver = round > 5`) and write all related state inside the event handler that originally fires the chain. Each effect link adds an extra render and makes the code rigid as requirements evolve
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/no-effect-chain.md
+      src/pages/Advisor.tsx:237
+
+  ⚠ react-doctor/rerender-functional-setstate
+      setCooldown(cooldown - ...) — use functional update to avoid stale closures
+      → Use the callback form: `setState(prev => prev + 1)` to always read the latest value
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/rerender-functional-setstate.md
+      src/pages/VerifyEmail.tsx:23
+
+  ⚠ react-doctor/client-passive-event-listeners
+      "scroll" listener without { passive: true } — blocks scrolling performance. Only add { passive: true } if the handler does NOT call event.preventDefault() (passive listeners silently ignore preventDefault())
+      → Add `{ passive: true }` as the third argument: `addEventListener('scroll', handler, { passive: true })`. Only do this if the handler does NOT call `event.preventDefault()` — passive listeners silently ignore `preventDefault()`, which breaks features like pull-to-refresh suppression, custom gestures, and nested-scroll containment.
+      Fetch & follow the canonical fix recipe before fixing: https://www.react.doctor/prompts/rules/react-doctor/client-passive-event-listeners.md
+      src/components/layout/PublicLayout.tsx:15
+
+  ┌─────┐  34 / 100 Critical · trackify
+  │ x x │  █████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  │  ▽  │  React Doctor (https://react.doctor)
+  └─────┘
+
+  495 issues
+  Full diagnostics written to /tmp/react-doctor-650508e8-04bc-4fe4-83e2-f86d728add2a
+
+  → Share: https://www.react.doctor/share?p=trackify&s=34&e=4&w=491&f=51
+
+

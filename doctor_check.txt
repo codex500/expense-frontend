@@ -1,0 +1,24 @@
+react-doctor v0.2.14
+
+  
+
+  Architecture › 259 warnings
+  Accessibility › 79 warnings
+  Correctness › 52 warnings
+  Dead Code › 41 warnings
+  State & Effects › 26 warnings
+  Bundle Size › 21 warnings
+  Performance › 15 warnings
+
+  ┌─────┐  42 / 100 Critical · trackify
+  │ x x │  █████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+  │  ▽  │  React Doctor (https://react.doctor)
+  └─────┘
+
+  493 issues
+  Run npx react-doctor@latest --verbose to list every issue with its fix-recipe URL
+  Each rule links a canonical fix recipe to fetch & follow before fixing, e.g. https://www.react.doctor/prompts/rules/react-doctor/design-no-redundant-size-axes.md
+
+  → Share: https://www.react.doctor/share?p=trackify&s=42&w=493&f=51
+
+

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, ArrowRight, TrendingDown, AlertCircle, Lightbulb, Bot, User, RefreshCcw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { useAdvisorInsights, useDashboardSummary, useCategoryExpenseAnalytics, useBudgets, useAccounts } from '@/hooks/useQueries';
 
 interface ChatMessage {
@@ -18,6 +18,28 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
+
+const CAT_KEYWORDS: Record<string, string[]> = {
+  'Food': ['food', 'dining', 'restaurant', 'grocery', 'groceries', 'eating'],
+  'Travel': ['travel', 'trip', 'flight', 'train', 'bus', 'fuel', 'petrol', 'transport'],
+  'Shopping': ['shopping', 'clothes', 'shoes', 'amazon', 'flipkart', 'buy'],
+  'Rent': ['rent', 'lease', 'housing', 'apartment'],
+  'Bills': ['bill', 'bills', 'electricity', 'water', 'internet', 'wifi', 'utility'],
+  'Entertainment': ['entertainment', 'movie', 'movies', 'netflix', 'game', 'gaming', 'concert'],
+  'Health': ['health', 'hospital', 'medicine', 'doctor', 'pharmacy', 'medical'],
+  'Education': ['education', 'school', 'college', 'course', 'books', 'tuition'],
+};
+
+const CAT_REGEXES: Record<string, RegExp> = {
+  'Food': /food|dining|restaurant|grocery|groceries|eating/i,
+  'Travel': /travel|trip|flight|train|bus|fuel|petrol|transport/i,
+  'Shopping': /shopping|clothes|shoes|amazon|flipkart|buy/i,
+  'Rent': /rent|lease|housing|apartment/i,
+  'Bills': /bill|bills|electricity|water|internet|wifi|utility/i,
+  'Entertainment': /entertainment|movie|movies|netflix|game|gaming|concert/i,
+  'Health': /health|hospital|medicine|doctor|pharmacy|medical/i,
+  'Education': /education|school|college|course|books|tuition/i,
+};
 
 // Smart response engine that uses real data
 function generateSmartResponse(
@@ -92,27 +114,22 @@ function generateSmartResponse(
     return `🏖️ Based on your current month:\n\n• Income: ₹${formatPaise(income)}\n• Already spent: ₹${formatPaise(expense)}\n• Remaining: ₹${formatPaise(remaining)}\n\n💡 I'd suggest spending at most **₹${formatPaise(suggestedHoliday)}** on discretionary items (30% of remaining) to stay financially healthy.`;
   }
 
-  // --- 4. Specific Category Checks (High Priority) ---
-  const catKeywords: Record<string, string[]> = {
-    'Food': ['food', 'dining', 'restaurant', 'grocery', 'groceries', 'eating'],
-    'Travel': ['travel', 'trip', 'flight', 'train', 'bus', 'fuel', 'petrol', 'transport'],
-    'Shopping': ['shopping', 'clothes', 'shoes', 'amazon', 'flipkart', 'buy'],
-    'Rent': ['rent', 'lease', 'housing', 'apartment'],
-    'Bills': ['bill', 'bills', 'electricity', 'water', 'internet', 'wifi', 'utility'],
-    'Entertainment': ['entertainment', 'movie', 'movies', 'netflix', 'game', 'gaming', 'concert'],
-    'Health': ['health', 'hospital', 'medicine', 'doctor', 'pharmacy', 'medical'],
-    'Education': ['education', 'school', 'college', 'course', 'books', 'tuition'],
-  };
-
-  for (const [catName, keywords] of Object.entries(catKeywords)) {
+  for (const [catName, keywords] of Object.entries(CAT_KEYWORDS)) {
     if (matches(keywords)) {
-      const cat = categories.find((c: any) => {
-        const cLower = c.category?.toLowerCase() || '';
-        return cLower === catName.toLowerCase() || keywords.some(k => cLower.includes(k));
-      });
+      let cat = categoryIndex.get(catName.toLowerCase());
+      if (!cat) {
+        const keywordRegex = CAT_REGEXES[catName];
+        for (const c of categories) {
+          const cLower = (c as any).category?.toLowerCase() || '';
+          if (keywordRegex.test(cLower)) {
+            cat = c;
+            break;
+          }
+        }
+      }
       if (!cat) return `🔍 No expenses recorded for **${catName}** this month.`;
-      const amt = cat.amountPaise || cat.totalPaise || cat.total_paise || 0;
-      return `🏷️ **${cat.category} spending:** ₹${formatPaise(amt)} (${cat.percentage}% of total expenses)\n\n${cat.percentage > 30 ? `⚠️ That's quite high for ${cat.category}! Consider cutting back if possible.` : `✅ Looks reasonable for your overall budget.`}`;
+      const amt = (cat as any).amountPaise || (cat as any).totalPaise || (cat as any).total_paise || 0;
+      return `🏷️ **${(cat as any).category} spending:** ₹${formatPaise(amt)} (${(cat as any).percentage}% of total expenses)\n\n${(cat as any).percentage > 30 ? `⚠️ That's quite high for ${(cat as any).category}! Consider cutting back if possible.` : `✅ Looks reasonable for your overall budget.`}`;
     }
   }
 
@@ -239,23 +256,18 @@ export function Advisor() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
-
-  // Welcome message
-  useEffect(() => {
-    if (!advisorLoading && messages.length === 0) {
-      const welcome: ChatMessage = {
-        id: generateId(),
-        role: 'advisor',
-        text: `👋 Welcome to your AI Financial Advisor!\n\nI analyze your real financial data to give personalized insights. Ask me anything about your spending, savings, budgets, or accounts.\n\n${advisorData?.warnings?.length ? `⚠️ **Heads up:** ${advisorData.warnings[0]}` : '✅ Your finances look healthy right now!'}`,
-        timestamp: new Date(),
-      };
-      setMessages([welcome]);
-    }
-  }, [advisorLoading]);
+  // Welcome message (Set during render instead of effect to prevent chaining)
+  const welcomeShown = useRef(false);
+  if (!advisorLoading && messages.length === 0 && !welcomeShown.current) {
+    welcomeShown.current = true;
+    const welcome: ChatMessage = {
+      id: generateId(),
+      role: 'advisor',
+      text: `👋 Welcome to your AI Financial Advisor!\n\nI analyze your real financial data to give personalized insights. Ask me anything about your spending, savings, budgets, or accounts.\n\n${advisorData?.warnings?.length ? `⚠️ **Heads up:** ${advisorData.warnings[0]}` : '✅ Your finances look healthy right now!'}`,
+      timestamp: new Date(),
+    };
+    setMessages([welcome]);
+  }
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -263,6 +275,7 @@ export function Advisor() {
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
+    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
 
     // Simulate brief "thinking" delay
     setTimeout(() => {
@@ -270,6 +283,7 @@ export function Advisor() {
       const advisorMsg: ChatMessage = { id: generateId(), role: 'advisor', text: response, timestamp: new Date() };
       setMessages(prev => [...prev, advisorMsg]);
       setIsTyping(false);
+      setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
     }, 600 + Math.random() * 800);
   };
 
@@ -282,119 +296,125 @@ export function Advisor() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
-          <Sparkles className="h-10 w-10 text-primary mx-auto animate-pulse" />
-          <p className="text-muted-foreground text-sm">Loading your financial data...</p>
+          <Sparkles className="size-10 text-primary mx-auto animate-pulse" />
+          <p className="text-muted-foreground text-sm">Loading your financial data…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
-            <Sparkles className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold tracking-tight">AI Advisor</h2>
-            <p className="text-xs text-muted-foreground">Powered by your real financial data</p>
-          </div>
-        </div>
-        <button 
-          onClick={() => setMessages([])} 
-          className="p-2 rounded-xl hover:bg-muted/50 text-muted-foreground transition-colors" 
-          title="Reset chat"
-        >
-          <RefreshCcw className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4 scrollbar-thin">
-        <AnimatePresence>
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
-            >
-              <div className={`h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                msg.role === 'advisor' ? 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20' : 'bg-primary/10'
-              }`}>
-                {msg.role === 'advisor' ? <Bot className="h-4 w-4 text-primary" /> : <User className="h-4 w-4 text-primary" />}
-              </div>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                msg.role === 'user' 
-                  ? 'bg-primary text-primary-foreground ml-auto' 
-                  : 'glass-card'
-              }`}>
-                <div className="whitespace-pre-wrap">{msg.text.split('**').map((part, i) => 
-                  i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
-                )}</div>
-                <p className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-primary-foreground/50' : 'text-muted-foreground/50'}`}>
-                  {msg.timestamp.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {isTyping && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
-              <Bot className="h-4 w-4 text-primary" />
+    <LazyMotion features={domAnimation}>
+      <div className="flex flex-col h-[calc(100vh-7rem)] animate-fade-in">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+              <Sparkles className="size-5 text-primary" />
             </div>
-            <div className="glass-card rounded-2xl px-4 py-3">
-              <div className="flex gap-1">
-                <div className="h-2 w-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="h-2 w-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="h-2 w-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">AI Advisor</h2>
+              <p className="text-xs text-muted-foreground">Powered by your real financial data</p>
             </div>
-          </motion.div>
-        )}
-        <div ref={chatEndRef} />
-      </div>
-
-      {/* Quick Prompts (show when chat is empty or short) */}
-      {messages.length <= 1 && (
-        <div className="py-3 flex flex-wrap gap-2">
-          {QUICK_PROMPTS.map((prompt) => (
-            <button
-              key={prompt}
-              onClick={() => sendMessage(prompt)}
-              className="glass-card rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {prompt}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="pt-3 border-t border-border/50">
-        <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your finances..."
-            disabled={isTyping}
-            className="flex-1 h-12 rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || isTyping}
-            className="h-12 w-12 rounded-xl btn-primary-glow flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[1.02] active:scale-[0.98]"
+          </div>
+          <button 
+            type="button"
+            onClick={() => setMessages([])} 
+            className="p-2 rounded-xl hover:bg-muted/50 text-muted-foreground transition-colors" 
+            title="Reset chat"
+            aria-label="Reset chat"
           >
-            <Send className="h-4 w-4" />
+            <RefreshCcw className="size-4" />
           </button>
         </div>
-      </form>
-    </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto py-4 space-y-4 scrollbar-thin">
+          <AnimatePresence>
+            {messages.map((msg) => (
+              <m.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex items-start gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+              >
+                <div className={`size-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  msg.role === 'advisor' ? 'bg-gradient-to-br from-indigo-500/20 to-violet-500/20' : 'bg-primary/10'
+                }`}>
+                  {msg.role === 'advisor' ? <Bot className="size-4 text-primary" /> : <User className="size-4 text-primary" />}
+                </div>
+                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  msg.role === 'user' 
+                    ? 'bg-primary text-primary-foreground ml-auto' 
+                    : 'glass-card'
+                }`}>
+                  <div className="whitespace-pre-wrap">{msg.text.split('**').map((part, i) => 
+                    i % 2 === 1 ? <strong key={`${part}-${i}`}>{part}</strong> : <span key={`${part}-${i}`}>{part}</span>
+                  )}</div>
+                  <p className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-primary-foreground/50' : 'text-muted-foreground/50'}`}>
+                    {msg.timestamp.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </m.div>
+            ))}
+          </AnimatePresence>
+
+          {isTyping && (
+            <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3">
+              <div className="size-8 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+                <Bot className="size-4 text-primary" />
+              </div>
+              <div className="glass-card rounded-2xl px-4 py-3">
+                <div className="flex gap-1">
+                  <div className="size-2 rounded-full bg-primary/50 animate-pulse" style={{ animationDelay: '0ms' }} />
+                  <div className="size-2 rounded-full bg-primary/50 animate-pulse" style={{ animationDelay: '150ms' }} />
+                  <div className="size-2 rounded-full bg-primary/50 animate-pulse" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            </m.div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Quick Prompts (show when chat is empty or short) */}
+        {messages.length <= 1 && (
+          <div className="py-3 flex flex-wrap gap-2">
+            {QUICK_PROMPTS.map((prompt) => (
+              <button
+                type="button"
+                key={prompt}
+                onClick={() => sendMessage(prompt)}
+                className="glass-card rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground hover:text-primary hover:border-primary/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Input */}
+        <form onSubmit={handleSubmit} className="pt-3 border-t border-border/50">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about your finances…"
+              disabled={isTyping}
+              aria-label="Your message"
+              className="flex-1 h-12 rounded-xl border border-input bg-background/50 px-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || isTyping}
+              className="size-12 rounded-xl btn-primary-glow flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Send className="size-4" />
+            </button>
+          </div>
+        </form>
+      </div>
+    </LazyMotion>
   );
 }
