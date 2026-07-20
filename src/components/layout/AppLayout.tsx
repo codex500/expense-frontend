@@ -54,7 +54,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   // Close sidebar on mobile when navigating
   useEffect(() => {
     setSidebarOpen(false);
-  }, [location.pathname]);
+  }, [location]);
 
   const userInitial = user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U';
 

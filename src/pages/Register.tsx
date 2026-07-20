@@ -12,10 +12,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { user, register: doRegister } = useAuthStore();
+  const { register, handleSubmit, formState: { errors } } = useForm<Form>();
 
   if (user) return <Navigate to="/" replace />;
-
-  const { register, handleSubmit, formState: { errors } } = useForm<Form>();
 
   const onSubmit = async (data: Form) => {
     setError('');

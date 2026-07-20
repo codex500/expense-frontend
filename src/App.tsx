@@ -7,6 +7,7 @@ import { useThemeStore } from '@/store/themeStore';
 import { authService } from '@/services/endpoints';
 import { Toaster } from 'sonner';
 import { Activity, AlertTriangle } from 'lucide-react';
+import { MotionConfig } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
@@ -135,12 +136,13 @@ function App() {
 
   return (
     <Suspense fallback={<GlobalLoader />}>
-      <Helmet>
-        <title>Trackify - Smart Expense Tracker</title>
-        <meta name="description" content="Track your expenses, manage budget, and analyze spending with Trackify." />
-        <link rel="canonical" href="https://trackifyapp.space" />
-      </Helmet>
-      <Toaster position="top-right" richColors theme={theme} />
+      <MotionConfig reducedMotion="user">
+        <Helmet>
+          <title>Trackify - Smart Expense Tracker</title>
+          <meta name="description" content="Track your expenses, manage budget, and analyze spending with Trackify." />
+          <link rel="canonical" href="https://trackifyapp.space" />
+        </Helmet>
+        <Toaster position="top-right" richColors theme={theme} />
       <Routes>
         {/* Public Marketing Routes */}
         <Route element={<PublicRoute><PublicLayout /></PublicRoute>}>
@@ -171,6 +173,7 @@ function App() {
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </MotionConfig>
     </Suspense>
   );
 }

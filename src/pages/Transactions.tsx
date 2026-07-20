@@ -50,7 +50,13 @@ export function Transactions() {
     setIsExporting(true);
     try {
       if (!user) throw new Error("User not found");
-      const dobFormatted = user.dob ? user.dob.split('-').reverse().join('') : '01012000';
+      let dobFormatted = '01012000';
+      if (user.dob) {
+        const d = new Date(user.dob);
+        if (!isNaN(d.getTime())) {
+          dobFormatted = `${String(d.getDate()).padStart(2, '0')}${String(d.getMonth() + 1).padStart(2, '0')}${d.getFullYear()}`;
+        }
+      }
       const namePrefix = (user.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
       const password = `${dobFormatted}${namePrefix}`;
 
@@ -153,9 +159,38 @@ export function Transactions() {
             <div className="min-w-fit rounded-full bg-indigo-500/10 p-2">
               <Lock className="h-4 w-4 text-indigo-500" />
             </div>
-            <p>
-              <strong className="text-foreground">PDFs are encrypted for security.</strong> To unlock your exported file, use your password: <code className="px-2 py-1 rounded bg-muted text-indigo-500 font-bold">{user ? `${user.dob ? user.dob.split('-').reverse().join('') : '01012000'}${(user.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X')}` : '01012000USER'}</code>
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <p>
+                <strong className="text-foreground">PDFs are encrypted for security.</strong> To unlock your exported file, use your password:
+              </p>
+              <code className="px-2 py-1 rounded bg-muted text-indigo-500 font-bold flex items-center gap-2 w-fit">
+                {(() => {
+                  let dobFmt = '01012000';
+                  if (user?.dob) {
+                    const d = new Date(user.dob);
+                    if (!isNaN(d.getTime())) dobFmt = `${String(d.getDate()).padStart(2, '0')}${String(d.getMonth() + 1).padStart(2, '0')}${d.getFullYear()}`;
+                  }
+                  const namePfx = (user?.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
+                  return `${dobFmt}${namePfx}`;
+                })()}
+                <button
+                  onClick={() => {
+                    let dobFmt = '01012000';
+                    if (user?.dob) {
+                      const d = new Date(user.dob);
+                      if (!isNaN(d.getTime())) dobFmt = `${String(d.getDate()).padStart(2, '0')}${String(d.getMonth() + 1).padStart(2, '0')}${d.getFullYear()}`;
+                    }
+                    const namePfx = (user?.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
+                    navigator.clipboard.writeText(`${dobFmt}${namePfx}`);
+                    toast.success('Password copied to clipboard!');
+                  }}
+                  className="hover:text-indigo-600 focus:outline-none"
+                  title="Copy password"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </code>
+            </div>
           </div>
         </div>
 

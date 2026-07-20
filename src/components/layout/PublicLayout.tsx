@@ -18,7 +18,7 @@ export function PublicLayout() {
 
   React.useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [location.pathname]);
+  }, [location]);
 
   const navLinks = [
     { name: 'Home', path: '/' },
