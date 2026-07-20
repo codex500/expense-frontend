@@ -106,9 +106,13 @@ function generateSmartResponse(
 
   for (const [catName, keywords] of Object.entries(catKeywords)) {
     if (matches(keywords)) {
-      const cat = categories.find((c: any) => c.category?.toLowerCase() === catName.toLowerCase());
+      const cat = categories.find((c: any) => {
+        const cLower = c.category?.toLowerCase() || '';
+        return cLower === catName.toLowerCase() || keywords.some(k => cLower.includes(k));
+      });
       if (!cat) return `🔍 No expenses recorded for **${catName}** this month.`;
-      return `🏷️ **${catName} spending:** ₹${formatPaise(cat.totalPaise || cat.total_paise || 0)} (${cat.percentage}% of total expenses)\n\n${cat.percentage > 30 ? `⚠️ That's quite high for ${catName}! Consider cutting back if possible.` : `✅ Looks reasonable for your overall budget.`}`;
+      const amt = cat.amountPaise || cat.totalPaise || cat.total_paise || 0;
+      return `🏷️ **${cat.category} spending:** ₹${formatPaise(amt)} (${cat.percentage}% of total expenses)\n\n${cat.percentage > 30 ? `⚠️ That's quite high for ${cat.category}! Consider cutting back if possible.` : `✅ Looks reasonable for your overall budget.`}`;
     }
   }
 
@@ -141,7 +145,8 @@ function generateSmartResponse(
     if (categories.length > 0) {
       res += `\n🏷️ **Top spending categories:**\n`;
       categories.slice(0, 3).forEach((c: any) => {
-        res += `• ${c.category}: ₹${formatPaise(c.totalPaise || c.total_paise || 0)} (${c.percentage}%)\n`;
+        const amt = c.amountPaise || c.totalPaise || c.total_paise || 0;
+        res += `• ${c.category}: ₹${formatPaise(amt)} (${c.percentage}%)\n`;
       });
     }
     if (warnings.length > 0) res += `\n⚠️ ${warnings[0]}`;
@@ -198,8 +203,9 @@ function generateSmartResponse(
     if (categories.length > 0) {
       res += `**Breakdown by category:**\n`;
       categories.forEach((c: any) => {
+        const amt = c.amountPaise || c.totalPaise || c.total_paise || 0;
         const bar = '█'.repeat(Math.max(1, Math.round((c.percentage || 0) / 5)));
-        res += `• ${c.category}: ₹${formatPaise(c.totalPaise || c.total_paise || 0)} ${bar} ${c.percentage}%\n`;
+        res += `• ${c.category}: ₹${formatPaise(amt)} ${bar} ${c.percentage}%\n`;
       });
     }
     if (trends?.expenseChange) {
