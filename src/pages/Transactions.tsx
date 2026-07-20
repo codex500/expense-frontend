@@ -154,7 +154,7 @@ export function Transactions() {
               <Lock className="h-4 w-4 text-indigo-500" />
             </div>
             <p>
-              <strong className="text-foreground">PDFs are encrypted for security.</strong> To unlock your exported file, use your Date of Birth (<strong className="text-indigo-500">DDMMYYYY</strong>) followed by the first 4 letters of your name (in uppercase). Example: <code className="px-1.5 py-0.5 rounded bg-muted">01012000JOHN</code>
+              <strong className="text-foreground">PDFs are encrypted for security.</strong> To unlock your exported file, use your password: <code className="px-2 py-1 rounded bg-muted text-indigo-500 font-bold">{user ? `${user.dob ? user.dob.split('-').reverse().join('') : '01012000'}${(user.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X')}` : '01012000USER'}</code>
             </p>
           </div>
         </div>

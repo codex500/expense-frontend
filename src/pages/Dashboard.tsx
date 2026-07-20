@@ -39,7 +39,7 @@ export function Dashboard() {
       : 'Week';
     return {
       name: label,
-      spent: (Number(d.expense_paise) || Number(d.expense) || 0) / 100,
+      spent: (Number(d.expensePaise) || Number(d.expense_paise) || Number(d.expense) || 0) / 100,
     };
   });
 
