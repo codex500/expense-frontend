@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, Plus, ArrowUpRight, ArrowDownRight, Calendar, CreditCard, Wallet2, X, Download, Trash2, Lock, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions, useAccounts } from '@/hooks/useQueries';
@@ -19,7 +20,15 @@ function formatPaise(paise: number): string {
 const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Salary', 'Rent', 'Education', 'Other'];
 
 export function Transactions() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+
+  useEffect(() => {
+    const s = searchParams.get('search');
+    if (s !== null) {
+      setSearchTerm(s);
+    }
+  }, [searchParams]);
   const [showModal, setShowModal] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -45,7 +54,13 @@ export function Transactions() {
       const namePrefix = (user.fullName || 'USER').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase().padEnd(4, 'X');
       const password = `${dobFormatted}${namePrefix}`;
 
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        encryption: {
+          userPassword: password,
+          ownerPassword: password,
+          userPermissions: ["print", "copy"]
+        }
+      });
 
       doc.setFontSize(20);
       doc.text('Transaction History', 14, 22);

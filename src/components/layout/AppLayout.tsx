@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Activity, CreditCard, LayoutDashboard, Menu, PieChart, Settings, Wallet, Bell, Search, X, Sparkles, Moon, Sun, LogOut, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeStore } from '@/store/themeStore';
@@ -25,6 +25,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [globalSearch, setGlobalSearch] = useState('');
   const { theme, setTheme } = useThemeStore();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -151,6 +153,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && globalSearch.trim()) {
+                    navigate(`/transactions?search=${encodeURIComponent(globalSearch.trim())}`);
+                    setGlobalSearch('');
+                  }
+                }}
                 placeholder="Search transactions, accounts..."
                 className="h-10 w-full rounded-xl border border-border/50 bg-muted/30 pl-10 pr-4 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
